@@ -2,13 +2,20 @@ var canvas = new fabric.Canvas('c', {
   preserveObjectStacking: true
 });
 
+function get_square(coor_x, coor_y){
+//returns the square in which (coor_x, coor_y) 
+	p = Math.floor(coor_x/62.5);
+	q = Math.floor(coor_y/62.5);
+	return [p, q];
+}
+
 //class of chess squares
+/*
 class chess_square{
-	constructor(x, y, occupied, img){
+	constructor(x, y, occupied){
 		this.x = x;
 		this.y = y;
 		this.occupied = occupied;
-		this.img = img;
 	}
 	get_x(){
 		return this.x;
@@ -19,10 +26,8 @@ class chess_square{
 	get_occ(){
 		return this.occupied;
 	}
-	get_img(){
-		return this.img;
-	}
-}
+}*/
+//class of chess squares not required so far
 
 var chessboard = [[], [], [], [], [], [], [], []];
 
@@ -31,7 +36,7 @@ var chessboard = [[], [], [], [], [], [], [], []];
 //lemme know if any of the colors need to be changed
 for(let i = 0; i < 8; i++){
 	for(let j = 0; j < 8; j++){
-		chessboard[i][j] = new chess_square(i, j, 0, 0);
+		chessboard[i][j] = 0;
 		var col;
 		if((i+j)%2 == 1){
 			col = "#654321";
@@ -69,10 +74,10 @@ class chess_piece{
 			img.set({
 				left: -3 + 62.5*x,
 				top: -3 + 62.5*y,
-				selectable: true
+				selectable: false,
+				opacity: 1
 			})
 			canvas.add(img);
-			return img;
 		});
 	}
 	get_x(){
@@ -91,51 +96,65 @@ class chess_piece{
 
 
 //positioning the pieces
-let wpawns = [];
 for(let i = 0; i<8; i++){
-	wpawns[i] = new chess_piece(i, 6, "l", "p");
-	chessboard[i][6] = new chess_square(i, 6, wpawns[i], wpawns[i].draw());
+	chessboard[i][6] = new chess_piece(i, 6, "l", "p");
+	chessboard[i][6].draw();
 }
-let bpawns = [];
 for(let i = 0; i<8; i++){
-	bpawns[i] = new chess_piece(i, 1, "d", "p");
-	chessboard[i][1] = new chess_square(i, 1, bpawns[i], bpawns[i].draw());
+	chessboard[i][1] = new chess_piece(i, 1, "d", "p");
+	chessboard[i][1].draw();
 }
-let wrooks = [];
 for(let i = 0; i<2; i++){
-	wrooks[i] = new chess_piece(7*i, 7, "l", "r");
-	chessboard[7*i][7] = new chess_square(7*i, 7, wrooks[i], wrooks[i].draw());
+	chessboard[7*i][7] = new chess_piece(7*i, 7, "l", "r");
+	chessboard[7*i][7].draw();
 }
-let brooks = [];
 for(let i = 0; i<2; i++){
-	brooks[i] = new chess_piece(7*i, 0, "d", "r");
-	chessboard[7*i][0] = new chess_square(7*i, 0, brooks[i], brooks[i].draw());
+	chessboard[7*i][0] = new chess_piece(7*i, 0, "d", "r");
+	chessboard[7*i][0].draw();
 }
-let wknights = [];
 for(let i = 0; i<2; i++){
-	wknights[i] = new chess_piece(1+5*i, 7, "l", "n");
-	chessboard[1+5*i][7] = new chess_square(1+5*i, 7, wknights[i], wknights[i].draw());
+	chessboard[1+5*i][7] = new chess_piece(1+5*i, 7, "l", "n");
+	chessboard[1+5*i][7].draw();
 }
-let bknights = [];
 for(let i = 0; i<2; i++){
-	bknights[i] = new chess_piece(1+5*i, 0, "d", "n");
-	chessboard[1+5*i][0] = new chess_square(1+5*i, 0, bknights[i], bknights[i].draw());
+	chessboard[1+5*i][0] = new chess_piece(1+5*i, 0, "d", "n");
+	chessboard[1+5*i][0].draw();
 }
-let wbishops = [];
 for(let i = 0; i<2; i++){
-	wbishops[i] = new chess_piece(2+3*i, 7, "l", "b");
-	chessboard[2+3*i][7] = new chess_square(2+3*i, 7, wbishops[i], wbishops[i].draw());
+	chessboard[2+3*i][7] = new chess_piece(2+3*i, 7, "l", "b");
+	chessboard[2+3*i][7].draw();
 }
-let bbishops = [];
 for(let i = 0; i<2; i++){
-	bbishops[i] = new chess_piece(2+3*i, 0, "d", "b");
-	chessboard[2+3*i][0] = new chess_square(2+3*i, 0, bbishops[i], bbishops[i].draw());
+	chessboard[2+3*i][0] = new chess_piece(2+3*i, 0, "d", "b");
+	chessboard[2+3*i][0].draw();
 }
-let wqueen = new chess_piece(3, 7, "l", "q");
-chessboard[3][7] = new chess_square(3, 7, wqueen, wqueen.draw());
-let bqueen = new chess_piece(3, 0, "d", "q");
-chessboard[3][0] = new chess_square(3, 0, bqueen, bqueen.draw());
-let wking = new chess_piece(4, 7, "l", "k");
-chessboard[4][7] = new chess_square(4, 7, wking, wking.draw());
-let bking = new chess_piece(4, 0, "d", "k");
-chessboard[4][0] = new chess_square(4, 0, bking, bking.draw());
+chessboard[3][7] = new chess_piece(3, 7, "l", "q");
+chessboard[3][7].draw();
+chessboard[3][0] = new chess_piece(3, 0, "d", "q");
+chessboard[3][0].draw();
+chessboard[4][7] = new chess_piece(4, 7, "l", "k");
+chessboard[4][7].draw();
+chessboard[4][0] = new chess_piece(4, 0, "d", "k");
+chessboard[4][0].draw();
+
+to_move = [8, 8]; //square to which piece is to be moved
+//[8,8] means that no move has been chosen yet
+
+canvas.on("mouse:down", function(options) {
+//main game loop
+	if(options.target.type == "image"){
+		if(to_move[0]!=8){
+			moved_from = get_square(options.e.clientX, options.e.clientY);
+			options.target.set("left", -3+62.5*to_move[0]);
+			options.target.set("top", -3+62.5*to_move[1]);
+			options.target.setCoords();
+			canvas.renderAll();
+			chessboard[to_move[0]][to_move[1]] = chessboard[moved_from[0]][moved_from[1]];
+			chessboard[moved_from[0]][moved_from[1]] = 0;
+			to_move = [8, 8];
+		}
+	}
+	else{
+		to_move = get_square(options.e.clientX, options.e.clientY);
+  }
+});
