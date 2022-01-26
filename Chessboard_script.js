@@ -1,8 +1,8 @@
 const canvas = document.querySelector('canvas');
 var c = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 500;
-canvas.height = 500;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 //class of chess squares
 class chess_square{
@@ -60,7 +60,7 @@ class chess_piece{
 		let color = this.color;
 		let piece = this.piece;
 		var img = new Image();
-		img.src = color+"_"+piece+".svg" //Save the svgs of the pieces as "color_piece.svg"
+		img.src = piece+color+"t.svg" 
 		img.onload = function(){ctx.drawImage(img, 8 + 62.5*x, 8 + 62.5*y);};
 	}
 	get_x(){
@@ -80,61 +80,61 @@ class chess_piece{
 //positioning the pieces
 let wpawns = [];
 for(let i = 0; i<8; i++){
-	wpawns[i] = new chess_piece(i, 6, "white", "pawn");
+	wpawns[i] = new chess_piece(i, 6, "l", "p");
 	reassign(i, 6);
 	wpawns[i].draw();
 }
 let bpawns = [];
 for(let i = 0; i<8; i++){
-	bpawns[i] = new chess_piece(i, 1, "black", "pawn");
+	bpawns[i] = new chess_piece(i, 1, "d", "p");
 	reassign(i, 1);
 	bpawns[i].draw();
 }
 let wrooks = [];
 for(let i = 0; i<2; i++){
-	wrooks[i] = new chess_piece(7*i, 7, "white", "rook");
+	wrooks[i] = new chess_piece(7*i, 7, "l", "r");
 	reassign(7*i, 7);
 	wrooks[i].draw();
 }
 let brooks = [];
 for(let i = 0; i<2; i++){
-	brooks[i] = new chess_piece(7*i, 0, "black", "rook");
+	brooks[i] = new chess_piece(7*i, 0, "d", "r");
 	reassign(7*i, 0);
 	brooks[i].draw();
 }
 let wknights = [];
 for(let i = 0; i<2; i++){
-	wknights[i] = new chess_piece(1+5*i, 7, "white", "knight");
+	wknights[i] = new chess_piece(1+5*i, 7, "l", "n");
 	reassign(1+5*i, 7);
-	//wknights[i].draw(); //need white_knight.svg
+	wknights[i].draw();
 }
 let bknights = [];
 for(let i = 0; i<2; i++){
-	bknights[i] = new chess_piece(1+5*i, 0, "black", "knight");
+	bknights[i] = new chess_piece(1+5*i, 0, "d", "n");
 	reassign(1+5*i, 0);
 	bknights[i].draw();
 }
 let wbishops = [];
 for(let i = 0; i<2; i++){
-	wbishops[i] = new chess_piece(2+3*i, 7, "white", "bishop");
+	wbishops[i] = new chess_piece(2+3*i, 7, "l", "b");
 	reassign(2+3*i, 7);
 	wbishops[i].draw();
 }
 let bbishops = [];
 for(let i = 0; i<2; i++){
-	bbishops[i] = new chess_piece(2+3*i, 0, "black", "bishop");
+	bbishops[i] = new chess_piece(2+3*i, 0, "d", "b");
 	reassign(2+3*i, 0);
 	bbishops[i].draw();
 }
-let wqueen = new chess_piece(3, 7, "white", "queen");
+let wqueen = new chess_piece(3, 7, "l", "q");
 reassign(3, 7);
 wqueen.draw();
-let bqueen = new chess_piece(3, 0, "black", "queen");
+let bqueen = new chess_piece(3, 0, "d", "q");
 reassign(3, 0);
 bqueen.draw();
-let wking = new chess_piece(4, 7, "white", "king");
+let wking = new chess_piece(4, 7, "l", "k");
 reassign(4, 7);
 wking.draw();
-let bking = new chess_piece(4, 0, "black", "king");
+let bking = new chess_piece(4, 0, "d", "k");
 reassign(4, 0);
 bking.draw();
