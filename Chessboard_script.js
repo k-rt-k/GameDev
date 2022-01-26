@@ -45,6 +45,16 @@ for(let i = 0; i < 8; i++){
 	}
 }
 
+class chess_board{
+	constructor(){
+		
+
+
+	}
+
+
+
+}
 
 //chess piece class
 class chess_piece{
@@ -53,6 +63,7 @@ class chess_piece{
 		this.y = y; //counting starts from 0 for x and y
 		this.color = color;
 		this.piece = piece;
+
 	}
 	draw(){
 		let x = this.x;
@@ -63,20 +74,26 @@ class chess_piece{
 		img.src = piece+color+"t.svg" 
 		img.onload = function(){ctx.drawImage(img, 8 + 62.5*x, 8 + 62.5*y);};
 	}
-	get_x(){
+	get get_x(){
 		return this.x;
 	}
-	get_y(){
+	get get_y(){
 		return this.y;
 	}
-	get_color(){
+	get get_color(){
 		return this.color;
 	}
-	get_piece(){
+	get get_piece(){
 		return this.piece;
 	}
-}
+	set moveto(X,Y){
+		this.x=X;
+		this.y=Y;
+	}
 
+}
+//white='l'(light), black='d' (dark)
+//'k'ing, 'q'ueen, 'b'ishop, k'n'ight, 'r'ook,'p'awn,'U'nicorn
 //positioning the pieces
 let wpawns = [];
 for(let i = 0; i<8; i++){
