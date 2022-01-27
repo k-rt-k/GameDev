@@ -109,7 +109,7 @@ class chess_piece{
 	}
 	moves(){
 		poss=[]
-		if (this.piece=="b"||this.piece=="q"){
+		if (this.piece=="r"||this.piece=="q"){
 			for(let x_inc=this.x+1;x_inc<8;x_inc++){
 				if (chessboard[x_inc][this.y]==0) poss.push([x_inc,this.y]);
 				else if (this.opp_colour(chessboard[x_inc][this.y])){
@@ -143,7 +143,7 @@ class chess_piece{
 				else break;
 			}
 		}
-		if (this.piece=="r"||this.piece=="q"){
+		if (this.piece=="b"||this.piece=="q"){
 			for(let y_inc=this.y+1,x_inc=this.x+1;y_inc<8&&x_inc<8;y_inc++, x_inc++){
 				if (chessboard[x_inc][y_inc]==0) poss.push([x_inc,y_inc]);
 				else if (this.opp_colour(chessboard[x_inc][y_inc])){
@@ -209,7 +209,7 @@ class chess_piece{
 		
 		return poss;
 	}
-}
+};
 
 
 //positioning the pieces
@@ -253,7 +253,7 @@ chessboard[4][7] = new chess_piece(4, 7, "l", "k");
 chessboard[4][7].draw();
 chessboard[4][0] = new chess_piece(4, 0, "d", "k");
 chessboard[4][0].draw();
-/*
+
 to_move = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
 
@@ -266,6 +266,8 @@ canvas.on("mouse:down", function(options) {
 			options.target.set("top", -3+62.5*to_move[1]);
 			options.target.setCoords();
 			canvas.renderAll();
+			if (chessboard[moved_from[0]][moved_from[1]].moves().includes(to_move))			
+			
 			chessboard[to_move[0]][to_move[1]] = chessboard[moved_from[0]][moved_from[1]];
 			chessboard[moved_from[0]][moved_from[1]] = 0;
 			to_move = [8, 8];
@@ -275,7 +277,7 @@ canvas.on("mouse:down", function(options) {
 		to_move = get_square(options.e.clientX, options.e.clientY);
   }
 });
-*/
+/*
 //alt main game loop
 legal_moves = []; //square to which piece is to be moved
 white_move=true;
@@ -308,3 +310,4 @@ canvas.on("mouse:down", function(options) {
 	
   }
 });
+*/
