@@ -268,7 +268,9 @@ chessboard[4][0].draw();
 move_to = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
 selected = false;
-white_move = true;
+white_move = 0;
+const w_b=["l","d"]
+col=0;
 to_be_moved = 0;
 legal_moves = [];
 canvas.on("mouse:down", function(options) {
@@ -276,20 +278,20 @@ canvas.on("mouse:down", function(options) {
 	if(selected){
 		move_to = get_square(options.e.clientX, options.e.clientY);
 		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
-			legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
-			console.log(legal_moves);
+			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
+			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
 				to_be_moved.set("left", -3+62.5*8);
 				to_be_moved.set("top", -3+62.5*8);
 				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
-				//console.log(col, pc);
 				
+				chessboard[move_to[0]][move_to[1]] = 0;
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
 				legal_moves = [];
 				moved_from = 0;
-				white_move = !white_move;
+				white_move = 1-white_move;
 			}
 		}
 		move_to = [8, 8];
@@ -301,8 +303,10 @@ canvas.on("mouse:down", function(options) {
 			moved_from = get_square(options.e.clientX, options.e.clientY);
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();
 			to_be_moved = options.target;
-			//if ((col=="l")!=(white_move)) break;
-			selected = true;
+			if (col==w_b[white_move]){
+				selected = true; 
+				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+			}
 		}
 	}
 });
