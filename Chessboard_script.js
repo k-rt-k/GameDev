@@ -41,9 +41,6 @@ class chess_square{
 
 var chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 
-function addif(set,X,Y){
-	if ((X<8)&&(Y<8)&&(X>=0)&&(Y>=0)) set.push([X,Y]);
-}
 
 //filling in the Chessboard
 //lemme know if any of the colors need to be changed
@@ -273,19 +270,24 @@ const w_b=["l","d"]
 col=0;
 to_be_moved = 0;
 legal_moves = [];
+var legal_moves_graphics=[];
+var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
+canvas.add(shade_piece);
 canvas.on("mouse:down", function(options) {
 //main game loop
 	if(selected){
 		move_to = get_square(options.e.clientX, options.e.clientY);
+		for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
+			canvas.remove(legal_moves_graphics[indexor]);
+		}
 		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
 			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
 			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
 				to_be_moved.set("left", -3+62.5*8);
 				to_be_moved.set("top", -3+62.5*8);
-				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
-				
-				chessboard[move_to[0]][move_to[1]] = 0;
+				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();			
+				//undraw the old thing somehow;
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
@@ -296,6 +298,7 @@ canvas.on("mouse:down", function(options) {
 		}
 		move_to = [8, 8];
 		selected = false;
+		shade_piece.set({width:0, height:0});
 		to_be_moved = 0;
 	}
 	else{
@@ -306,6 +309,18 @@ canvas.on("mouse:down", function(options) {
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+				shade_piece.set({
+					left: 62.5*moved_from[0],
+					top: 62.5*moved_from[1],	
+					width: 62.5,
+					height: 62.5,
+				});
+				for (var indexor=0; indexor<legal_moves.length; indexor++){
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
+					canvas.add(legal_moves_graphics[indexor]);
+				}
+
+				
 			}
 		}
 	}
