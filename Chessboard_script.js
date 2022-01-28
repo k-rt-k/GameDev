@@ -301,9 +301,9 @@ canvas.on("mouse:down", function(options) {
 	else{
 		if(options.target.type == "image"){
 			moved_from = get_square(options.e.clientX, options.e.clientY);
-			col = chessboard[moved_from[0]][moved_from[1]].get_color();
-			to_be_moved = options.target;
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
 			if (col==w_b[white_move]){
+				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
 			}
