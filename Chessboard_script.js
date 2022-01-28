@@ -41,9 +41,6 @@ class chess_square{
 
 var chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 
-function addif(set,X,Y){
-	if ((X<8)&&(Y<8)&&(X>=0)&&(Y>=0)) set.push([X,Y]);
-}
 
 //filling in the Chessboard
 //lemme know if any of the colors need to be changed
@@ -76,13 +73,7 @@ class chess_piece{
 		this.y = y; //counting starts from 0 for x and y
 		this.color = color;
 		this.piece = piece;
-	}
-	draw(){
-		let x = this.x;
-		let y = this.y;
-		let color = this.color;
-		let piece = this.piece;
-		fabric.Image.fromURL(piece+color+"t.png", function(img){
+		this.image=fabric.Image.fromURL(piece+color+"t.png", function(img){
 			img.set({
 				left: -3 + 62.5*x,
 				top: -3 + 62.5*y,
@@ -91,6 +82,9 @@ class chess_piece{
 			})
 			canvas.add(img);
 		});
+	}
+	draw(){
+		return;
 	}
 	get_x(){
 		return this.x;
@@ -268,41 +262,63 @@ chessboard[4][0].draw();
 move_to = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
 selected = false;
-white_move = true;
+white_move = 0;
+const w_b=["l","d"]
+col=0;
 to_be_moved = 0;
 legal_moves = [];
+var legal_moves_graphics=[];
+var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
+canvas.add(shade_piece);
 canvas.on("mouse:down", function(options) {
 //main game loop
 	if(selected){
 		move_to = get_square(options.e.clientX, options.e.clientY);
+		for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
+			canvas.remove(legal_moves_graphics[indexor]);
+		}
 		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
-			legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
-			console.log(legal_moves);
+			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
+			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
 				to_be_moved.set("left", -3+62.5*8);
 				to_be_moved.set("top", -3+62.5*8);
-				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
-				//console.log(col, pc);
-				
+				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();			
+				//undraw the old thing somehow;
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
 				legal_moves = [];
 				moved_from = 0;
-				white_move = !white_move;
+				white_move = 1-white_move;
 			}
 		}
 		move_to = [8, 8];
 		selected = false;
+		shade_piece.set({width:0, height:0});
 		to_be_moved = 0;
 	}
 	else{
 		if(options.target.type == "image"){
 			moved_from = get_square(options.e.clientX, options.e.clientY);
-			col = chessboard[moved_from[0]][moved_from[1]].get_color();
-			to_be_moved = options.target;
-			//if ((col=="l")!=(white_move)) break;
-			selected = true;
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
+			if (col==w_b[white_move]){
+				to_be_moved = options.target;
+				selected = true; 
+				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+				shade_piece.set({
+					left: 62.5*moved_from[0],
+					top: 62.5*moved_from[1],	
+					width: 62.5,
+					height: 62.5,
+				});
+				for (var indexor=0; indexor<legal_moves.length; indexor++){
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
+					canvas.add(legal_moves_graphics[indexor]);
+				}
+
+				
+			}
 		}
 	}
 });
