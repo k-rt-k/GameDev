@@ -9,6 +9,15 @@ function get_square(coor_x, coor_y){
 	return [p, q];
 }
 
+function my_includes(legal_moves, move_to){
+	for(let i = 0; i<legal_moves.length; i++){
+		if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){
+			return true;
+		}
+	}
+	return false;
+}
+
 
 //class of chess squares
 /*
@@ -40,7 +49,6 @@ function addif(set,X,Y){
 //lemme know if any of the colors need to be changed
 for(let i = 0; i < 8; i++){
 	for(let j = 0; j < 8; j++){
-		chessboard[i][j] = 0;
 		var col;
 		if((i+j)%2 == 1){
 			col = "#654321";
@@ -95,20 +103,21 @@ class chess_piece{
 	}
 	is_white(){
 		return (this.color=="l");
-	}
-	same_color(other){
-		if (typeof(other)=="number") return false;
-		else return (this.color==other.color);
-	}
+	} //why?
+	
 	opp_colour(other){
 		if (typeof(other)=="number") return false;
 		else return (this.color!=other.color);
+	}
+	same_color(other){
+		if (typeof(other)=="number") return false;
+		else return (!this.opp_colour(other));
 	}
 	get_piece(){
 		return this.piece;
 	}
 	moves(){
-		poss=[]
+		var poss = []
 		if (this.piece=="r"||this.piece=="q"){
 			for(let x_inc=this.x+1;x_inc<8;x_inc++){
 				if (chessboard[x_inc][this.y]==0) poss.push([x_inc,this.y]);
@@ -195,21 +204,23 @@ class chess_piece{
 
 		}
 		else if (this.piece=="n"){
-			let all_poss=[[1,2],[1,-2],[-1,2],[-1,-2],[2,1],[2,-1],[-2,1],[-2,-1]];
+			let all_poss=[[this.x+1,this.y+2],[this.x+1,this.y-2],[this.x-1,this.y+2],[this.x-1,this.y-2],[this.x+2,this.y+1],[this.x+2,this.y-1],[this.x-2,this.y+1],[this.x-2,this.y-1]];
 			for (let i=0; i<8;i++){
-				if (!this.same_color(chessboard[this.x+all_poss[i][0]][this.y+all_poss[i][1]])){addif(poss,this.x+all_poss[i][0],this.y+all_poss[i][1])}
+				let condition=all_poss[i][0]<8&&all_poss[i][0]>=0&&all_poss[i][1]<8&&all_poss[i][1]>=0&&!this.same_color(chessboard[all_poss[i][0]][all_poss[i][1]]);
+				if (condition){poss.push(all_poss[i]);}
 			}
 		}
 		else if (this.piece=="k"){
-			let all_poss=[[1,1],[1,-1],[-1,1],[-1,-1],[0,1],[0,-1],[-1,0],[1,0]];
+			let all_poss=[[this.x+1,this.y+1],[this.x+1,this.y-1],[this.x-1,this.y+1],[this.x-1,this.y-1],[this.x,this.y+1],[this.x,this.y-1],[this.x-1,this.y],[this.x+1,this.y]];
 			for (let i=0; i<8;i++){
-				if (!this.same_color(chessboard[this.x+all_poss[i][0]][this.y+all_poss[i][1]])){addif(poss,this.x+all_poss[i][0],this.y+all_poss[i][1])}
+				let condition=all_poss[i][0]<8&&all_poss[i][0]>=0&&all_poss[i][1]<8&&all_poss[i][1]>=0&&!this.same_color(chessboard[all_poss[i][0]][all_poss[i][1]]);
+				if (condition){poss.push(all_poss[i]);}
 			}
 		}
 		
 		return poss;
 	}
-};
+}
 
 
 //positioning the pieces
@@ -254,29 +265,48 @@ chessboard[4][7].draw();
 chessboard[4][0] = new chess_piece(4, 0, "d", "k");
 chessboard[4][0].draw();
 
-to_move = [8, 8]; //square to which piece is to be moved
+move_to = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
-
+selected = false;
+white_move = true;
+to_be_moved = 0;
+legal_moves = [];
 canvas.on("mouse:down", function(options) {
 //main game loop
-	if(options.target.type == "image"){
-		if(to_move[0]!=8){
-			moved_from = get_square(options.e.clientX, options.e.clientY);
-			options.target.set("left", -3+62.5*to_move[0]);
-			options.target.set("top", -3+62.5*to_move[1]);
-			options.target.setCoords();
-			canvas.renderAll();
-			if (chessboard[moved_from[0]][moved_from[1]].moves().includes(to_move))			
-			
-			chessboard[to_move[0]][to_move[1]] = chessboard[moved_from[0]][moved_from[1]];
-			chessboard[moved_from[0]][moved_from[1]] = 0;
-			to_move = [8, 8];
+	if(selected){
+		move_to = get_square(options.e.clientX, options.e.clientY);
+		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
+			legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
+			console.log(legal_moves);
+			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
+				to_be_moved.set("left", -3+62.5*8);
+				to_be_moved.set("top", -3+62.5*8);
+				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
+				//console.log(col, pc);
+				
+				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
+				chessboard[move_to[0]][move_to[1]].draw();
+				chessboard[moved_from[0]][moved_from[1]] = 0;
+				legal_moves = [];
+				moved_from = 0;
+				white_move = !white_move;
+			}
 		}
+		move_to = [8, 8];
+		selected = false;
+		to_be_moved = 0;
 	}
 	else{
-		to_move = get_square(options.e.clientX, options.e.clientY);
-  }
+		if(options.target.type == "image"){
+			moved_from = get_square(options.e.clientX, options.e.clientY);
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();
+			to_be_moved = options.target;
+			//if ((col=="l")!=(white_move)) break;
+			selected = true;
+		}
+	}
 });
+
 /*
 //alt main game loop
 legal_moves = []; //square to which piece is to be moved
@@ -309,5 +339,4 @@ canvas.on("mouse:down", function(options) {
 	}
 	
   }
-});
-*/
+});*/
