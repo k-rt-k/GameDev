@@ -270,6 +270,8 @@ legal_moves = [];
 var legal_moves_graphics=[];
 var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
 canvas.add(shade_piece);
+
+
 canvas.on("mouse:down", function(options) {
 //main game loop
 	if(selected){
@@ -281,9 +283,10 @@ canvas.on("mouse:down", function(options) {
 			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
 			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
-				to_be_moved.set("left", -3+62.5*8);
-				to_be_moved.set("top", -3+62.5*8);
-				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();			
+				/*to_be_moved.set("left", -3+62.5*8);
+				to_be_moved.set("top", -3+62.5*8);*/
+				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();	
+				canvas.remove(to_be_moved);
 				//undraw the old thing somehow;
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
@@ -299,9 +302,11 @@ canvas.on("mouse:down", function(options) {
 		to_be_moved = 0;
 	}
 	else{
-		if(options.target.type == "image"){
-			moved_from = get_square(options.e.clientX, options.e.clientY);
-			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
+		moved_from = get_square(options.e.clientX, options.e.clientY);
+		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
+			console.log(moved_from);
+			console.log(chessboard[moved_from[0]][moved_from[1]]);
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
 			if (col==w_b[white_move]){
 				to_be_moved = options.target;
 				selected = true; 
@@ -310,49 +315,16 @@ canvas.on("mouse:down", function(options) {
 					left: 62.5*moved_from[0],
 					top: 62.5*moved_from[1],	
 					width: 62.5,
-					height: 62.5,
+					height: 62.5
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
 					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
-
-				
 			}
+		}
+		else{
+			moved_from = [];
 		}
 	}
 });
-
-/*
-//alt main game loop
-legal_moves = []; //square to which piece is to be moved
-white_move=true;
-selected=false;
-moved_from=0;
-//[8,8] means that no move has been chosen yet
-
-canvas.on("mouse:down", function(options) {
-//main game loop
-	if (typeof(moved_from)=="object"){
-		move_to = get_square(options.e.clientX, options.e.clientY);
-		if (legal_moves.includes(move_to)){
-			options.target.set("left", -3+62.5*move_to[0]);
-			options.target.set("top", -3+62.5*move_to[1]);
-			options.target.setCoords();
-			canvas.renderAll();
-			chessboard[move_to[0]][move_to[1]] = chessboard[moved_from[0]][moved_from[1]];
-			chessboard[moved_from[0]][moved_from[1]] = 0;
-			legal_moves=[];
-			moved_from=0;
-			white_move=!white_move;
-		}
-	else if(options.target.type == "image"){
-		
-		moved_from = get_square(options.e.clientX, options.e.clientY);
-		if (chessboard[moved_from[0]][moved_from[1]].is_white()^white_move){moved_from=0;continue;}
-		legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
-		
-	}
-	
-  }
-});*/
