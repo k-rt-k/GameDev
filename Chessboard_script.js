@@ -104,20 +104,21 @@ class chess_piece{
 	is_white(){
 		return (this.color=="l");
 	} //why?
-	same_color(other){
-		if (typeof(other)=="number") return false;
-		else return (this.color==other.color);
-	}
+	
 	opp_colour(other){
 		if (typeof(other)=="number") return false;
 		else return (this.color!=other.color);
+	}
+	same_color(other){
+		if (typeof(other)=="number") return false;
+		else return (!this.opp_colour(other));
 	}
 	get_piece(){
 		return this.piece;
 	}
 	moves(){
 		var poss = []
-		if (this.piece=="b"||this.piece=="q"){
+		if (this.piece=="r"||this.piece=="q"){
 			for(let x_inc=this.x+1;x_inc<8;x_inc++){
 				if (chessboard[x_inc][this.y]==0) poss.push([x_inc,this.y]);
 				else if (this.opp_colour(chessboard[x_inc][this.y])){
@@ -151,7 +152,7 @@ class chess_piece{
 				else break;
 			}
 		}
-		if (this.piece=="r"||this.piece=="q"){
+		if (this.piece=="b"||this.piece=="q"){
 			for(let y_inc=this.y+1,x_inc=this.x+1;y_inc<8&&x_inc<8;y_inc++, x_inc++){
 				if (chessboard[x_inc][y_inc]==0) poss.push([x_inc,y_inc]);
 				else if (this.opp_colour(chessboard[x_inc][y_inc])){
@@ -203,15 +204,17 @@ class chess_piece{
 
 		}
 		else if (this.piece=="n"){
-			let all_poss=[[1,2],[1,-2],[-1,2],[-1,-2],[2,1],[2,-1],[-2,1],[-2,-1]];
+			let all_poss=[[this.x+1,this.y+2],[this.x+1,this.y-2],[this.x-1,this.y+2],[this.x-1,this.y-2],[this.x+2,this.y+1],[this.x+2,this.y-1],[this.x-2,this.y+1],[this.x-2,this.y-1]];
 			for (let i=0; i<8;i++){
-				if (!this.same_color(chessboard[this.x+all_poss[i][0]][this.y+all_poss[i][1]])){addif(poss,this.x+all_poss[i][0],this.y+all_poss[i][1])}
+				let condition=all_poss[i][0]<8&&all_poss[i][0]>=0&&all_poss[i][1]<8&&all_poss[i][1]>=0&&!this.same_color(chessboard[all_poss[i][0]][all_poss[i][1]]);
+				if (condition){poss.push(all_poss[i]);}
 			}
 		}
 		else if (this.piece=="k"){
-			let all_poss=[[1,1],[1,-1],[-1,1],[-1,-1],[0,1],[0,-1],[-1,0],[1,0]];
+			let all_poss=[[this.x+1,this.y+1],[this.x+1,this.y-1],[this.x-1,this.y+1],[this.x-1,this.y-1],[this.x,this.y+1],[this.x,this.y-1],[this.x-1,this.y],[this.x+1,this.y]];
 			for (let i=0; i<8;i++){
-				if (!this.same_color(chessboard[this.x+all_poss[i][0]][this.y+all_poss[i][1]])){addif(poss,this.x+all_poss[i][0],this.y+all_poss[i][1])}
+				let condition=all_poss[i][0]<8&&all_poss[i][0]>=0&&all_poss[i][1]<8&&all_poss[i][1]>=0&&!this.same_color(chessboard[all_poss[i][0]][all_poss[i][1]]);
+				if (condition){poss.push(all_poss[i]);}
 			}
 		}
 		
@@ -278,9 +281,9 @@ canvas.on("mouse:down", function(options) {
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
 				to_be_moved.set("left", -3+62.5*8);
 				to_be_moved.set("top", -3+62.5*8);
-				col = chessboard[moved_from[0]][moved_from[1]].get_color();
 				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
 				//console.log(col, pc);
+				
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
@@ -296,7 +299,9 @@ canvas.on("mouse:down", function(options) {
 	else{
 		if(options.target.type == "image"){
 			moved_from = get_square(options.e.clientX, options.e.clientY);
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();
 			to_be_moved = options.target;
+			//if ((col=="l")!=(white_move)) break;
 			selected = true;
 		}
 	}
