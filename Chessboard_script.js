@@ -73,13 +73,7 @@ class chess_piece{
 		this.y = y; //counting starts from 0 for x and y
 		this.color = color;
 		this.piece = piece;
-	}
-	draw(){
-		let x = this.x;
-		let y = this.y;
-		let color = this.color;
-		let piece = this.piece;
-		fabric.Image.fromURL(piece+color+"t.png", function(img){
+		this.image=fabric.Image.fromURL(piece+color+"t.png", function(img){
 			img.set({
 				left: -3 + 62.5*x,
 				top: -3 + 62.5*y,
@@ -88,6 +82,9 @@ class chess_piece{
 			})
 			canvas.add(img);
 		});
+	}
+	draw(){
+		return;
 	}
 	get_x(){
 		return this.x;
