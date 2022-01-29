@@ -34,10 +34,11 @@ class chess_piece{
 		this.piece = piece;
 	}
 	draw(){              
+		let x=this.x,y=this.y;
 		fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				left: -3 + hekcenterx(this.x,this.y) ,
-				top: -3 + hekcentery(this.x,this.y) ,
+				left: CENTERX+UNIT_LENGTH*((x-5)+y/2-z(x,y)/2)-34,
+				top:  CENTERY-UNIT_LENGTH*((y+z(x,y)-10)*1.732/2) -34 ,
 				selectable: false,
 				opacity: 1
 			});
