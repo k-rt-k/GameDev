@@ -353,6 +353,38 @@ var legal_moves_graphics=[];
 var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
 canvas.add(shade_piece);
 
+var bkcastle=true, bqcastle=true, wkcastle=true , wqcastle=true;
+function castling(moved_from,moved_to){
+	
+	if (chessboard[moved_from[0]][moved_from[1]].get_color=="l"){
+		if (moved_to[1]==7){
+			if ((moved_from[0]<moved_to[0])&&wkcastle&&my_includes(chessboard[7][7].poss_moves(),moved_from)){//king side
+				//
+				return true;
+			}
+			else if ((moved_from[0]>moved_to[0])&&wqcastle&&my_includes(chessboard[0][7].poss_moves(),moved_from)){
+				//
+				return true;
+			}
+		}
+	}
+	else{
+		if (moved_to[1]==0){
+			if ((moved_from[0]<moved_to[0])&&bkcastle&&my_includes(chessboard[7][0].poss_moves(),moved_from)){//king side
+				//
+				return true;
+			}
+			else if ((moved_from[0]>moved_to[0])&&bqcastle&&my_includes(chessboard[0][0].poss_moves(),moved_from)){
+				//
+				return true;
+			}
+
+		}
+	}
+	
+	return false;
+
+}
 
 canvas.on("mouse:down", function(options) {
 //main game loop
@@ -404,8 +436,12 @@ canvas.on("mouse:down", function(options) {
 						}
 					}
 				}
-				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
-				chessboard[move_to[0]][move_to[1]].draw();
+				//chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
+				//chessboard[move_to[0]][move_to[1]].draw();
+				if (!((pc=="k")&&(castling(moved_from,move_to)))){
+					chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
+					chessboard[move_to[0]][move_to[1]].draw();
+				}
 				chessboard[moved_from[0]][moved_from[1]] = 0;
 				legal_moves = [];
 				moved_from = 0;
@@ -437,6 +473,13 @@ canvas.on("mouse:down", function(options) {
 	}
 	else{
 	//choosing the piece
+		let b_in_check=is_in_check(chessboard, "d"),w_in_check=is_in_check(chessboard, "l");
+		bkcastle=bkcastle&&(chessboard[4][0]!=0)&&(chessboard[7][0]!=0)&&(chessboard[4][0].get_piece()=="k")&&(chessboard[7][0].get_piece()=="r")&&!b_in_check;
+		bqcastle=bqcastle&&(chessboard[4][0]!=0)&&(chessboard[0][0]!=0)&&(chessboard[4][0].get_piece()=="k")&&(chessboard[0][0].get_piece()=="r")&&!b_in_check;
+		wkcastle=wkcastle&&(chessboard[4][7]!=0)&&(chessboard[7][7]!=0)&&(chessboard[4][7].get_piece()=="k")&&(chessboard[7][7].get_piece()=="r")&&!w_in_check;
+		wqcastle=wqcastle&&(chessboard[4][7]!=0)&&(chessboard[0][7]!=0)&&(chessboard[4][7].get_piece()=="k")&&(chessboard[0][7].get_piece()=="r")&&!w_in_check;
+
+		
 		moved_from = get_square(options.e.clientX, options.e.clientY);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
@@ -446,6 +489,24 @@ canvas.on("mouse:down", function(options) {
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+				if(legal_moves.length == 0){
+					if(white_move==0){
+						if(w_in_check){
+							console.log("Checkmate, Black Wins");
+						}
+						else{
+							console.log("Tie by Stalemate");
+						}
+					}
+					else{
+						if(b_in_check){
+							console.log("Checkmate, White Wins");
+						}
+						else{
+							console.log("Tie by Stalemate");
+						}
+					}
+				}
 				shade_piece.set({
 					left: 62.5*moved_from[0],
 					top: 62.5*moved_from[1],	
@@ -453,9 +514,9 @@ canvas.on("mouse:down", function(options) {
 					height: 62.5
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:1.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+30,top:62.5*legal_moves[indexor][1]+30});
 					canvas.add(legal_moves_graphics[indexor]);
-					canvas.sendToBack(legal_moves_graphics[indexor]);
+					//canvas.sendToBack(legal_moves_graphics[indexor]);
 				}
 			}
 		}
