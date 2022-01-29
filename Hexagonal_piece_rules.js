@@ -3,6 +3,7 @@
 var canvas = new fabric.Canvas('c', {
 	preserveObjectStacking: true
   });
+ 
 /* coordinates
          y10/\
           y0| |
@@ -15,17 +16,33 @@ var canvas = new fabric.Canvas('c', {
 //white taken towards 0 side
 let z =(x,y)=>5+y-x;
 let y=(x,z)=>x+z-5;
-const CENTERX= 400;//change
-const CENTERY= 400;
-const UNIT_LENGTH=40;
+const CENTERX= canvas.width/2;//change
+const CENTERY= canvas.height/2;
+const UNIT_LENGTH=canvas.width/16;
 
-let hekcenterx=(x,y)=>CENTERX+UNIT_LENGTH*((x-5)+y/2-z(x,y)/2);
-let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*((y+z(x,y)-10)*1.732/2);
+let hekcenterx=(x,y)=>CENTERX+UNIT_LENGTH*3*(x-5)/2;
+let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*(2*y-x-5)*1.732/2;
 
 function all_in_bounds(x,y){
     zee=z(x,y);
     return (x>=0&&x<11&&y>=0&&y<11&&zee>=0&&zee<11);
 }
+
+function get_hex(x_coord,y_coord){
+	let X = Math.floor(2*(x_coord-CENTERX)/(UNIT_LENGTH*3))+5;
+	let Y = Math.floor((X+5 + 2*(y_coord-CENTERY)/(UNIT_LENGTH*1.732))/2);
+	return [X,Y];
+}
+
+function my_includes(legal_moves, move_to){
+	for(let i = 0; i<legal_moves.length; i++){
+		if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){
+			return true;
+		}
+	}
+	return false;
+}
+
 class chess_piece{
 	constructor(x, y, color, piece){
 		this.x = x; 
@@ -37,8 +54,8 @@ class chess_piece{
 		let x=this.x,y=this.y;
 		fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				left: CENTERX+UNIT_LENGTH*((x-5)+y/2-z(x,y)/2)-34,
-				top:  CENTERY-UNIT_LENGTH*((y+z(x,y)-10)*1.732/2) -34 ,
+				left: CENTERX+UNIT_LENGTH*3*(x-5)/2 -34,
+				top:  CENTERY-UNIT_LENGTH*(2*y-x-5)*1.732/2 -34 ,
 				selectable: false,
 				opacity: 1
 			});
@@ -170,7 +187,7 @@ class chess_piece{
 		}
 
 		else if (this.piece=="p"){
-			if (this.is_white()){
+			if (this.color=="l"){
 				if (chessboard[this.x][this.y+1]==0) poss.push([this.x,this.y+1]);
 				if ((this.y==4||z(this.x,this.y)==4)&&chessboard[this.x][this.y+2]==0) poss.push([this.x,this.y+2]);
 				if (all_in_bounds(this.x+1,this.y)&&this.opp_colour(chessboard[this.x+1][this.y])) poss.push([this.x+1,this.y]);
@@ -294,3 +311,72 @@ for (var it=0;it<3;it++){
 	chessboard[6][1].draw();
 	chessboard[6][10]=new chess_piece(6,10,"d","k");
 	chessboard[6][10].draw();
+
+
+
+//main game->
+move_to = [11, 11]; //square to which piece is to be moved
+//[11,11] means that no move has been chosen yet
+selected = false;
+white_move = 0;
+const w_b=["l","d"]
+col=0;
+to_be_moved = 0;
+legal_moves = [];
+var legal_moves_graphics=[];
+var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
+canvas.add(shade_piece);
+
+
+canvas.on("mouse:down", function(options) {
+//main game loop
+	if(selected){
+		move_to = get_hex(options.e.clientX, options.e.clientY);
+		for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
+			canvas.remove(legal_moves_graphics[indexor]);
+		}
+		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
+			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
+			//console.log(legal_moves);
+			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
+				to_be_moved.set("left", hekcenterx(11,11));
+				to_be_moved.set("top", hekcentery(11,11));
+				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();			
+				//undraw the old thing somehow;
+				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
+				chessboard[move_to[0]][move_to[1]].draw();
+				chessboard[moved_from[0]][moved_from[1]] = 0;
+				legal_moves = [];
+				moved_from = 0;
+				white_move = 1-white_move;
+			}
+		}
+		move_to = [11, 11];
+		selected = false;
+		shade_piece.set({width:0, height:0});
+		to_be_moved = 0;
+	}
+	else{
+		if(options.target.type == "image"){
+			moved_from = get_hex(options.e.clientX, options.e.clientY);
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
+			if (col==w_b[white_move]){
+				to_be_moved = options.target;
+				selected = true; 
+				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+				shade_piece.set({
+					left: CENTERX+UNIT_LENGTH*3*(moved_from[0]-5)/2 -20,
+					top:  CENTERY-UNIT_LENGTH*(2*moved_from[1]-moved_from[0]-5)*1.732/2 -20 ,	
+					width: 40,
+					height: 40,
+				});
+				for (var indexor=0; indexor<legal_moves.length; indexor++){
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:10, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -10 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*1.732/2 -10});
+					canvas.add(legal_moves_graphics[indexor]);
+				}
+
+				
+			}
+		}
+	}
+});
