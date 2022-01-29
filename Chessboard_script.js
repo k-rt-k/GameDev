@@ -2,6 +2,16 @@ var canvas = new fabric.Canvas('c', {
   preserveObjectStacking: true
 });
 
+/*function get_image(x, y) {
+//use this only if you are sure that an image exists at that point
+	var objArray = canvas.getObjects();
+    for(let i = 0; i<objArray.length; i++){
+		if(objArray[i].left == -3 + 62.5*x && objArray[i].top == -3 + 62.5*y){
+			return objArray[i];
+		}
+	}
+}*/
+
 function get_square(coor_x, coor_y){
 //returns the square in which (coor_x, coor_y) 
 	p = Math.floor(coor_x/62.5);
@@ -93,22 +103,23 @@ for(let i = 0; i < 8; i++){
 	}
 }
 
-
+//var imgset = [];
 //chess piece class
 class chess_piece{
-	constructor(x, y, color, piece){
+	constructor(x, y, color, piece, num_moves){
 		this.x = x; //origin at the top left corner, x - axis goes right, y - axis goes down
 		this.y = y; //counting starts from 0 for x and y
 		this.color = color;
 		this.piece = piece;
-		//this.id = id;
+		this.num_moves = num_moves;
 	}
 	draw(){
 		let x = this.x;
 		let y = this.y;
+		let col = this.color;
+		let pc = this.pc;
 		this.image=fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				//id: this.id,
 				left: -3 + 62.5*x,
 				top: -3 + 62.5*y,
 				selectable: false,
@@ -126,13 +137,12 @@ class chess_piece{
 	get_color(){
 		return this.color;
 	}
-	/*get_id(){
-		return this.id;
-	}*/
+	get_num_moves(){
+		return this.num_moves;
+	}
 	is_white(){
 		return (this.color=="l");
 	} //why?
-	
 	opp_colour(other){
 		if (typeof(other)=="number") return false;
 		else return (this.color!=other.color);
@@ -249,19 +259,9 @@ class chess_piece{
 	}
 	moves(){
 		let poss = this.poss_moves(chessboard);
-		//console.log("ayy lmao", poss);
 		var actual_poss = [];
-		/*for(let i = 0; i<8; i++){
-			for(let j = 0; j<8; j++){
-				new_chessboard[i][j] = chessboard[i][j];
-			}
-		}*/
-		//console.log(this.x, this.y);
 		for(let i = 0; i<poss.length; i++){
 			var new_chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-			//console.log(chessboard[this.x][this.y]);
-			//console.log(this.x, this.y);
-			//new_chessboard[this.x][this.y] = 0;
 			for(let p = 0; p<8; p++){
 				for(let q = 0; q<8; q++){
 					if(p==this.x&&q==this.y){
@@ -275,13 +275,133 @@ class chess_piece{
 					}
 				}
 			}
-			//console.log(new_chessboard);
-			//new_chessboard[poss[i][0]][poss[i][1]] = new chess_piece(poss[i][0], poss[i][1], this.color, this.piece);
 			if(!is_in_check(new_chessboard, this.color)){actual_poss.push(poss[i]);}
-			/*new_chessboard[this.x][this.y] = chessboard[this.x][this.y];
-			new_chessboard[poss[i][0]][poss[i][1]] = chessboard[poss[i][0]][poss[i][1]];*/
 		}
-		//console.log(actual_poss);
+		if(this.piece=="k"){
+			if(this.num_moves==0){
+				let k_row = 0;
+				if(this.color=="l"){
+					k_row = 7;
+				}
+				if(chessboard[7][k_row]!=0){
+					if(chessboard[7][k_row].get_num_moves()==0){
+						if(chessboard[5][k_row]==0 && chessboard[6][k_row]==0){
+							let chessboard1 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard1[i][j] = 0;
+									}
+									else if(i == 5 && j == k_row){
+										chessboard1[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard1[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							let chessboard2 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard2[i][j] = 0;
+									}
+									else if(i == 6 && j == k_row){
+										chessboard2[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard2[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							let chessboard3 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard3[i][j] = 0;
+									}
+									else if(i == 7 && j == k_row){
+										chessboard3[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard3[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color)){
+								actual_poss.push([6, k_row]);
+							}
+						}
+					}
+				}
+				if(chessboard[0][k_row]!=0){
+					if(chessboard[0][k_row].get_num_moves()==0){
+						if(chessboard[1][k_row] == 0 && chessboard[2][k_row] == 0 && chessboard[3][k_row] == 0){
+							let chessboard1 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard1[i][j] = 0;
+									}
+									else if(i == 3 && j == k_row){
+										chessboard1[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard1[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							let chessboard2 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard2[i][j] = 0;
+									}
+									else if(i == 2 && j == k_row){
+										chessboard2[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard2[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							let chessboard3 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard3[i][j] = 0;
+									}
+									else if(i == 1 && j == k_row){
+										chessboard3[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard3[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							let chessboard4 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+							for(let i = 0; i<8; i++){
+								for(let j = 0; j<8; j++){
+									if(i == 4 && j == k_row){
+										chessboard4[i][j] = 0;
+									}
+									else if(i == 0 && j == k_row){
+										chessboard4[i][j] = chessboard[4][7];
+									}
+									else{
+										chessboard4[i][j] = chessboard[i][j];
+									}
+								}
+							}
+							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
+								actual_poss.push([2, k_row]);
+							}
+						}
+					}
+				}
+			}
+		}
+		console.log(actual_poss);
 		return actual_poss;
 	}
 }
@@ -299,47 +419,67 @@ function f_legal_moves(this_chessboard, col){
 	return false;
 }
 
+
+
 //positioning the pieces
 for(let i = 0; i<8; i++){
-	chessboard[i][6] = new chess_piece(i, 6, "l", "p");
+	chessboard[i][6] = new chess_piece(i, 6, "l", "p", 0);
 	chessboard[i][6].draw();
 }
 for(let i = 0; i<8; i++){
-	chessboard[i][1] = new chess_piece(i, 1, "d", "p");
+	chessboard[i][1] = new chess_piece(i, 1, "d", "p", 0);
 	chessboard[i][1].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[7*i][7] = new chess_piece(7*i, 7, "l", "r");
+	chessboard[7*i][7] = new chess_piece(7*i, 7, "l", "r", 0);
 	chessboard[7*i][7].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[7*i][0] = new chess_piece(7*i, 0, "d", "r");
+	chessboard[7*i][0] = new chess_piece(7*i, 0, "d", "r", 0);
 	chessboard[7*i][0].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[1+5*i][7] = new chess_piece(1+5*i, 7, "l", "n");
+	chessboard[1+5*i][7] = new chess_piece(1+5*i, 7, "l", "n", 0);
 	chessboard[1+5*i][7].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[1+5*i][0] = new chess_piece(1+5*i, 0, "d", "n");
+	chessboard[1+5*i][0] = new chess_piece(1+5*i, 0, "d", "n", 0);
 	chessboard[1+5*i][0].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[2+3*i][7] = new chess_piece(2+3*i, 7, "l", "b");
+	chessboard[2+3*i][7] = new chess_piece(2+3*i, 7, "l", "b", 0);
 	chessboard[2+3*i][7].draw();
 }
 for(let i = 0; i<2; i++){
-	chessboard[2+3*i][0] = new chess_piece(2+3*i, 0, "d", "b");
+	chessboard[2+3*i][0] = new chess_piece(2+3*i, 0, "d", "b", 0);
 	chessboard[2+3*i][0].draw();
 }
-chessboard[3][7] = new chess_piece(3, 7, "l", "q");
-chessboard[3][7].draw();
-chessboard[3][0] = new chess_piece(3, 0, "d", "q");
+chessboard[3][7] = new chess_piece(3, 7, "l", "q", 0);
+let x = chessboard[3][7].draw();
+chessboard[3][0] = new chess_piece(3, 0, "d", "q", 0);
 chessboard[3][0].draw();
-chessboard[4][7] = new chess_piece(4, 7, "l", "k");
+chessboard[4][7] = new chess_piece(4, 7, "l", "k", 0);
 chessboard[4][7].draw();
-chessboard[4][0] = new chess_piece(4, 0, "d", "k");
+chessboard[4][0] = new chess_piece(4, 0, "d", "k", 0);
 chessboard[4][0].draw();
+
+function coverup(i, j){
+//use this as a last resort
+	chessboard[i][j] = 0;
+	let file_name = "ls.png"
+	if((i+j)%2!=0){file_name = "ds.png";}
+	this.image=fabric.Image.fromURL(file_name, function(img){
+			img.set({
+				left: 62.5*i,
+				top: 62.5*j,
+				width: 62.5,
+				height: 62.5,
+				selectable: false,
+				opacity: 1
+			})
+			canvas.add(img);
+		});
+}
 
 move_to = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
@@ -353,47 +493,15 @@ var legal_moves_graphics=[];
 var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
 canvas.add(shade_piece);
 
-var bkcastle=true, bqcastle=true, wkcastle=true , wqcastle=true;
-function castling(moved_from,moved_to){
-	
-	if (chessboard[moved_from[0]][moved_from[1]].get_color=="l"){
-		if (moved_to[1]==7){
-			if ((moved_from[0]<moved_to[0])&&wkcastle&&my_includes(chessboard[7][7].poss_moves(),moved_from)){//king side
-				//
-				return true;
-			}
-			else if ((moved_from[0]>moved_to[0])&&wqcastle&&my_includes(chessboard[0][7].poss_moves(),moved_from)){
-				//
-				return true;
-			}
-		}
-	}
-	else{
-		if (moved_to[1]==0){
-			if ((moved_from[0]<moved_to[0])&&bkcastle&&my_includes(chessboard[7][0].poss_moves(),moved_from)){//king side
-				//
-				return true;
-			}
-			else if ((moved_from[0]>moved_to[0])&&bqcastle&&my_includes(chessboard[0][0].poss_moves(),moved_from)){
-				//
-				return true;
-			}
-
-		}
-	}
-	
-	return false;
-
-}
 
 canvas.on("mouse:down", function(options) {
 //main game loop
 	if(selected){
 	//moving the piece
 		move_to = get_square(options.e.clientX, options.e.clientY);
-		for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
+		/*for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
 			canvas.remove(legal_moves_graphics[indexor]);
-		}
+		}*/
 		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
 			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
 			//console.log(legal_moves);
@@ -436,12 +544,20 @@ canvas.on("mouse:down", function(options) {
 						}
 					}
 				}
-				//chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
-				//chessboard[move_to[0]][move_to[1]].draw();
-				if (!((pc=="k")&&(castling(moved_from,move_to)))){
-					chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
-					chessboard[move_to[0]][move_to[1]].draw();
+				if(pc == "k"){
+					if(move_to[0]-moved_from[0] == 2){
+						chessboard[move_to[0]-1][move_to[1]] = new chess_piece(move_to[0]-1, move_to[1], col, "r", 1);
+						chessboard[move_to[0]-1][move_to[1]].draw();
+						coverup(7, move_to[1]);
+					}
+					else if(move_to[0]-moved_from[0] == -2){
+						chessboard[move_to[0]+1][move_to[1]] = new chess_piece(move_to[0]+1, move_to[1], col, "r", 1);
+						chessboard[move_to[0]+1][move_to[1]].draw();
+						coverup(0, move_to[1]);
+					}
 				}
+				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, chessboard[moved_from[0]][moved_from[1]].get_num_moves()+1);
+				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
 				legal_moves = [];
 				moved_from = 0;
@@ -473,13 +589,6 @@ canvas.on("mouse:down", function(options) {
 	}
 	else{
 	//choosing the piece
-		let b_in_check=is_in_check(chessboard, "d"),w_in_check=is_in_check(chessboard, "l");
-		bkcastle=bkcastle&&(chessboard[4][0]!=0)&&(chessboard[7][0]!=0)&&(chessboard[4][0].get_piece()=="k")&&(chessboard[7][0].get_piece()=="r")&&!b_in_check;
-		bqcastle=bqcastle&&(chessboard[4][0]!=0)&&(chessboard[0][0]!=0)&&(chessboard[4][0].get_piece()=="k")&&(chessboard[0][0].get_piece()=="r")&&!b_in_check;
-		wkcastle=wkcastle&&(chessboard[4][7]!=0)&&(chessboard[7][7]!=0)&&(chessboard[4][7].get_piece()=="k")&&(chessboard[7][7].get_piece()=="r")&&!w_in_check;
-		wqcastle=wqcastle&&(chessboard[4][7]!=0)&&(chessboard[0][7]!=0)&&(chessboard[4][7].get_piece()=="k")&&(chessboard[0][7].get_piece()=="r")&&!w_in_check;
-
-		
 		moved_from = get_square(options.e.clientX, options.e.clientY);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
@@ -489,35 +598,19 @@ canvas.on("mouse:down", function(options) {
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
-				if(legal_moves.length == 0){
-					if(white_move==0){
-						if(w_in_check){
-							console.log("Checkmate, Black Wins");
-						}
-						else{
-							console.log("Tie by Stalemate");
-						}
-					}
-					else{
-						if(b_in_check){
-							console.log("Checkmate, White Wins");
-						}
-						else{
-							console.log("Tie by Stalemate");
-						}
-					}
-				}
-				shade_piece.set({
+				/*shade_piece.set({
 					left: 62.5*moved_from[0],
 					top: 62.5*moved_from[1],	
 					width: 62.5,
 					height: 62.5
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:1.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+30,top:62.5*legal_moves[indexor][1]+30});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
 					canvas.add(legal_moves_graphics[indexor]);
-					//canvas.sendToBack(legal_moves_graphics[indexor]);
-				}
+					canvas.sendToBack(legal_moves_graphics[indexor]);
+				}*/
+				//these graphics interfere with the functioning of the pieces
+				//although they did look good :(
 			}
 		}
 		else{
