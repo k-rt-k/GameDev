@@ -9,19 +9,22 @@ var canvas = new fabric.Canvas('c', {
          x0 \/ x10
 */
 /*tranformation from coord to location: 
-	x=CENTERX+LENGTH((x-5)+y/2-z/2)
-	y=CENTERY+LENGTH((y+z-10)*1.732/2)
+	x=CENTERX+UNIT_LENGTH*((x-5)+y/2-z/2)
+	y=CENTERY-UNIT_LENGTH*((y+z-10)*1.732/2)
 */
 //white taken towards 0 side
 let z =(x,y)=>5+y-x;
 let y=(x,z)=>x+z-5;
 const CENTERX= 400;//change
 const CENTERY= 400;
-const LENGTH=30;
+const UNIT_LENGTH=40;
+
+let hekcenterx=(x,y)=>CENTERX+UNIT_LENGTH*((x-5)+y/2-z(x,y)/2);
+let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*((y+z(x,y)-10)*1.732/2);
 
 function all_in_bounds(x,y){
     zee=z(x,y);
-    return (x>=0&&x<11&&y>=0&&y<11&&zee>=0&&zee<11)
+    return (x>=0&&x<11&&y>=0&&y<11&&zee>=0&&zee<11);
 }
 class chess_piece{
 	constructor(x, y, color, piece){
@@ -30,16 +33,14 @@ class chess_piece{
 		this.color = color;
 		this.piece = piece;
 	}
-	draw(){              //must find transformation
-		let x=this.x,y=this.y;
-		let zed = z(x,y);
+	draw(){              
 		fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				left: -3 + CENTERX+LENGTH*((x-5)+y/2-zed/2),
-				top: -3 + CENTERY-LENGTH*((y+zed-10)*1.732/2),
+				left: -3 + hekcenterx(this.x,this.y) ,
+				top: -3 + hekcentery(this.x,this.y) ,
 				selectable: false,
 				opacity: 1
-			})
+			});
 			canvas.add(img);
 		});
 	}
@@ -212,7 +213,35 @@ var chessboard=[[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0
 /*
 draw the chessboard here
 */
-
+for(let i = 0; i < 11; i++){
+	for(let j = 0; j < 11; j++){
+		if (all_in_bounds(i,j)){
+			let col;
+			let X=hekcenterx(i,j);
+			let Y=hekcentery(i,j);
+			if((i+j)%3 == 2){
+				col = "#654321";
+			}
+			else if((i+j)%3==1){
+				col="#875d33";
+			}
+			else{
+				col = "#c4a484";
+			}
+			var hexy = new fabric.Polygon([
+				{ x: X-UNIT_LENGTH, y: Y },
+				{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2 },
+				{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2},
+				{ x: X+UNIT_LENGTH, y: Y},
+				{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2},
+				{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2}],{
+				fill: col,
+				selectable: false
+			});
+			canvas.add(hexy);
+	}
+	}
+}
 //This is Glinsky's Hexagonal chess variant, many others exist
 //piece initialisation
 
