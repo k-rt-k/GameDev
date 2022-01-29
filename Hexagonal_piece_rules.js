@@ -6,9 +6,11 @@
          x0 \/ x10
 */
 //white taken towards 0 side
-let z =(x,y)=>5+y-x;
+let z =(x,y)=>5+y-x; //check
+let y=(x,z)=>x+z-5;	//check
+
 function all_in_bounds(x,y){
-    zee=5+y-x;
+    zee=z(x,y);
     return (x>=0&&x<11&&y>=0&&y<11&&zee>=0&&zee<11)
 }
 class chess_piece{
@@ -18,8 +20,8 @@ class chess_piece{
 		this.color = color;
 		this.piece = piece;
 	}
-/*	draw(){              must find transformation
-		let x = this.x;
+	draw(){ return}             //must find transformation
+		/*let x = this.x;
 		let y = this.y;
 		let color = this.color;
 		let piece = this.piece;
@@ -192,3 +194,62 @@ class chess_piece{
 		return poss;
 	}
 }
+
+var chessboard=[[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]];
+//only 91 possible coordinates exist, either enforce that here, or in subsequent steps
+/*
+draw the chessboard here
+*/
+
+//This is Glinsky's Hexagonal chess variant, many others exist
+//piece initialisation
+
+//pawns
+for(var eks=1;eks<6;eks++){
+	chessboard[eks][6]=new chess_piece(eks,6,"d","p");
+	chessboard[eks][6].draw();
+	chessboard[10-eks][4]=new chess_piece(10-eks,4,"l","p");
+	chessboard[10-eks][4].draw();
+}
+for(var eks=1,vai=0;vai<4;eks++,vai++){
+	chessboard[eks][vai]=new chess_piece(eks,vai,"l","p");
+	chessboard[eks][vai].draw();
+	chessboard[10-eks][10-vai]=new chess_piece(10-eks,10-vai,"d","p");
+	chessboard[10-eks][10-vai].draw();
+}
+
+//rooks
+	chessboard[4][0]=new chess_piece(4,0,"l","r");
+	chessboard[4][0].draw();
+	chessboard[4][9]=new chess_piece(4,9,"d","r");
+	chessboard[4][9].draw();
+	chessboard[4][0]=new chess_piece(4,0,"l","r");
+	chessboard[4][0].draw();
+	chessboard[4][9]=new chess_piece(4,9,"d","r");
+	chessboard[4][9].draw();
+//knights
+	chessboard[3][0]=new chess_piece(3,0,"l","n");
+	chessboard[3][0].draw();
+	chessboard[3][8]=new chess_piece(3,8,"d","n");
+	chessboard[3][8].draw();
+	chessboard[7][2]=new chess_piece(7,2,"l","n");
+	chessboard[7][2].draw();
+	chessboard[7][10]=new chess_piece(7,10,"d","n");
+	chessboard[7][10].draw();
+//bishops
+for (var it=1;it<=3;it++){
+	chessboard[5][it]=new chess_piece(5,it,"l","b");
+	chessboard[5][it].draw();
+	chessboard[5][10-it]=new chess_piece(5,10-it,"d","b");
+	chessboard[5][10-it].draw();
+}
+//queen
+	chessboard[4][0]=new chess_piece(4,0,"l","q");
+	chessboard[4][0].draw();
+	chessboard[4][9]=new chess_piece(4,9,"d","q");
+	chessboard[4][9].draw();
+//king
+	chessboard[6][1]=new chess_piece(6,1,"l","k");
+	chessboard[6][1].draw();
+	chessboard[6][10]=new chess_piece(6,10,"d","k");
+	chessboard[6][10].draw();
