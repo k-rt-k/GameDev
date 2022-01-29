@@ -194,6 +194,11 @@ class chess_piece{
 		return poss;
 	}
 }
+//promotion:
+/*
+	for white- (y==10)||(z==10)
+	for black  (y==0)||(z==0)
+*/
 
 var chessboard=[[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]];
 //only 91 possible coordinates exist, either enforce that here, or in subsequent steps
@@ -237,7 +242,7 @@ for(var eks=1,vai=0;vai<4;eks++,vai++){
 	chessboard[7][10]=new chess_piece(7,10,"d","n");
 	chessboard[7][10].draw();
 //bishops
-for (var it=1;it<=3;it++){
+for (var it=0;it<3;it++){
 	chessboard[5][it]=new chess_piece(5,it,"l","b");
 	chessboard[5][it].draw();
 	chessboard[5][10-it]=new chess_piece(5,10-it,"d","b");
