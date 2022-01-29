@@ -2,22 +2,12 @@
 <html>
     <head>
         <title>Chess</title>
-        <style>
-            
-            canvas{
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                align-content: center;
-               
-            }
-            
-        </style>
-        <script src="./Chessboard_script.js"></script>
+        <script src="fabric.min.js"></script>
 
     </head>
     <body>
-        <canvas> 
+        <canvas id = "c" width = 800 height = 800> 
+            <script src="Hexagonal_piece_rules.js"></script>
         </canvas>
 
     </body>

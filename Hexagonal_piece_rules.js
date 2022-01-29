@@ -1,13 +1,23 @@
 //chess piece class
 //refer Hexagonal_chess.png
+var canvas = new fabric.Canvas('c', {
+	preserveObjectStacking: true
+  });
 /* coordinates
          y10/\
           y0| |
          x0 \/ x10
 */
+/*tranformation from coord to location: 
+	x=CENTERX+LENGTH((x-5)+y/2-z/2)
+	y=CENTERY+LENGTH((y+z-10)*1.732/2)
+*/
 //white taken towards 0 side
-let z =(x,y)=>5+y-x; //check
-let y=(x,z)=>x+z-5;	//check
+let z =(x,y)=>5+y-x;
+let y=(x,z)=>x+z-5;
+const CENTERX= 400;//change
+const CENTERY= 400;
+const LENGTH=30;
 
 function all_in_bounds(x,y){
     zee=z(x,y);
@@ -16,26 +26,23 @@ function all_in_bounds(x,y){
 class chess_piece{
 	constructor(x, y, color, piece){
 		this.x = x; 
-        
+        this.y = y;
 		this.color = color;
 		this.piece = piece;
 	}
-	draw(){ return}             //must find transformation
-		/*let x = this.x;
-		let y = this.y;
-		let color = this.color;
-		let piece = this.piece;
-		fabric.Image.fromURL(piece+color+"t.png", function(img){
+	draw(){              //must find transformation
+		let x=this.x,y=this.y;
+		let zed = z(x,y);
+		fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				left: -3 + 62.5*x,
-				top: -3 + 62.5*y,
+				left: -3 + CENTERX+LENGTH*((x-5)+y/2-zed/2),
+				top: -3 + CENTERY-LENGTH*((y+zed-10)*1.732/2),
 				selectable: false,
 				opacity: 1
 			})
 			canvas.add(img);
 		});
 	}
-*/
 	get_x(){
 		return this.x;
 	}
@@ -222,16 +229,15 @@ for(var eks=1,vai=0;vai<4;eks++,vai++){
 	chessboard[10-eks][10-vai]=new chess_piece(10-eks,10-vai,"d","p");
 	chessboard[10-eks][10-vai].draw();
 }
-
 //rooks
-	chessboard[4][0]=new chess_piece(4,0,"l","r");
-	chessboard[4][0].draw();
-	chessboard[4][9]=new chess_piece(4,9,"d","r");
-	chessboard[4][9].draw();
-	chessboard[4][0]=new chess_piece(4,0,"l","r");
-	chessboard[4][0].draw();
-	chessboard[4][9]=new chess_piece(4,9,"d","r");
-	chessboard[4][9].draw();
+	chessboard[2][0]=new chess_piece(2,0,"l","r");
+	chessboard[2][0].draw();
+	chessboard[2][7]=new chess_piece(2,7,"d","r");
+	chessboard[2][7].draw();
+	chessboard[8][3]=new chess_piece(8,3,"l","r");
+	chessboard[8][3].draw();
+	chessboard[8][10]=new chess_piece(8,10,"d","r");
+	chessboard[8][10].draw();
 //knights
 	chessboard[3][0]=new chess_piece(3,0,"l","n");
 	chessboard[3][0].draw();
