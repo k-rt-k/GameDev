@@ -46,6 +46,7 @@ function is_in_check(chessboard, col){
 }
 
 
+
 //class of chess squares
 /*
 class chess_square{
@@ -285,6 +286,18 @@ class chess_piece{
 	}
 }
 
+function f_legal_moves(this_chessboard, col){
+	for(let i = 0; i<8; i++){
+		for(let j = 0; j<8; j++){
+			if(this_chessboard[i][j] == 0){continue;}
+			if(this_chessboard[i][j].get_color()!=col){continue;}
+			if(this_chessboard[i][j].moves().length!=0){
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 //positioning the pieces
 for(let i = 0; i<8; i++){
@@ -344,6 +357,7 @@ canvas.add(shade_piece);
 canvas.on("mouse:down", function(options) {
 //main game loop
 	if(selected){
+	//moving the piece
 		move_to = get_square(options.e.clientX, options.e.clientY);
 		for (var indexor=0; indexor<legal_moves_graphics.length; indexor++){
 			canvas.remove(legal_moves_graphics[indexor]);
@@ -364,6 +378,32 @@ canvas.on("mouse:down", function(options) {
 					//canvas.remove(options.target);
 					canvas.remove(options.target);
 				}
+				if(pc == "p"){
+					if(col == "l"){
+						if(move_to[1]==0){
+							while(true){
+								let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
+								if(input == "q" || input == "b" || input == "n" || input == "r"){
+									pc = input;
+									break;
+								}
+								alert("Your input is invalid (You cannot promote to a king or a pawn)");
+							}
+						}
+					}
+					else{
+						if(move_to[1]==7){
+							while(true){
+								let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
+								if(input == "q" || input == "b" || input == "n" || input == "r"){
+									pc = input;
+									break;
+								}
+								alert("Your input is invalid (You cannot promote to a king or a pawn)");
+							}
+						}
+					}
+				}
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
@@ -376,8 +416,27 @@ canvas.on("mouse:down", function(options) {
 		selected = false;
 		shade_piece.set({width:0, height:0});
 		to_be_moved = 0;
+		if(!f_legal_moves(chessboard, w_b[white_move])){
+			if(white_move==0){
+				if(is_in_check(chessboard, "l")){
+					alert("Checkmate, Black Wins");
+				}
+				else{
+					alert("Tie by Stalemate");
+				}
+			}
+			else{
+				if(is_in_check(chessboard, "d")){
+					alert("Checkmate, White Wins");
+				}
+				else{
+					alert("Tie by Stalemate");
+				}
+			}
+		}
 	}
 	else{
+	//choosing the piece
 		moved_from = get_square(options.e.clientX, options.e.clientY);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
@@ -387,24 +446,6 @@ canvas.on("mouse:down", function(options) {
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
-				if(legal_moves.length == 0){
-					if(white_move==0){
-						if(is_in_check(chessboard, "l")){
-							console.log("Checkmate, Black Wins");
-						}
-						else{
-							console.log("Tie by Stalemate");
-						}
-					}
-					else{
-						if(is_in_check(chessboard, "d")){
-							console.log("Checkmate, White Wins");
-						}
-						else{
-							console.log("Tie by Stalemate");
-						}
-					}
-				}
 				shade_piece.set({
 					left: 62.5*moved_from[0],
 					top: 62.5*moved_from[1],	
