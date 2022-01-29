@@ -36,12 +36,12 @@ function fischer_random(){
 
     let nnq=["n","n","q"];
     for(let i = 0; i<3; i++){
-        var rand_row=free_squares[Math.floor(Math.random()*free_squares.length)]   
+        var rand_row=free_squares[Math.floor(Math.random()*free_squares.length)];   
         chessboard[rand_row][7]= new chess_piece(rand_row,7,"l",nnq[i]);
         chessboard[rand_row][7].draw();
         chessboard[rand_row][0]= new chess_piece(rand_row,0,"d",nnq[i]);
         chessboard[rand_row][0].draw();
-        remove_from(free_squares,rand_row)
+        remove_from(free_squares,rand_row);
     }
     let rkr=["r","k","r"];
     for(let i = 0; i<3; i++){     
