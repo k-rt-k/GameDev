@@ -401,7 +401,6 @@ class chess_piece{
 				}
 			}
 		}
-		console.log(actual_poss);
 		return actual_poss;
 	}
 }
