@@ -208,20 +208,18 @@ class chess_piece{
 		else if (this.piece=="p"){
 			if (this.get_color()=="l"){
 				if (my_chessboard[this.x][this.y-1]==0) poss.push([this.x,this.y-1]);
-				if (this.y==6&&my_chessboard[this.x][this.y-2]==0) poss.push([this.x,this.y-2]);
+				if (this.y==6&&my_chessboard[this.x][this.y-2]==0&&my_chessboard[this.x][this.y-1]==0) poss.push([this.x,this.y-2]);
 				if (this.x<7&&this.opp_colour(my_chessboard[this.x+1][this.y-1])) poss.push([this.x+1,this.y-1]);
 				if (this.x>0&&this.opp_colour(my_chessboard[this.x-1][this.y-1])) poss.push([this.x-1,this.y-1]);
 				if (this.y==3&&can_en_passant[1]==3&&(this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],2]);
 			}
 			else{
 				if (my_chessboard[this.x][this.y+1]==0) poss.push([this.x,this.y+1]);
-				if (this.y==1&&my_chessboard[this.x][this.y+2]==0) poss.push([this.x,this.y+2]);
+				if (this.y==1&&my_chessboard[this.x][this.y+2]==0&&my_chessboard[this.x][this.y+1]==0) poss.push([this.x,this.y+2]);
 				if (this.x<7&&this.opp_colour(my_chessboard[this.x+1][this.y+1])) poss.push([this.x+1,this.y+1]);
 				if (this.x>0&&this.opp_colour(my_chessboard[this.x-1][this.y+1])) poss.push([this.x-1,this.y+1]);
 				if (this.y==4&&can_en_passant[1]==4&&(this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],5]);
 			}
-
-
 		}
 		else if (this.piece=="n"){
 			let all_poss=[[this.x+1,this.y+2],[this.x+1,this.y-2],[this.x-1,this.y+2],[this.x-1,this.y-2],[this.x+2,this.y+1],[this.x+2,this.y-1],[this.x-2,this.y+1],[this.x-2,this.y-1]];
