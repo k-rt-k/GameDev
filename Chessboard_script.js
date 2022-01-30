@@ -55,27 +55,9 @@ function is_in_check(chessboard, col){
 	return false;
 }
 
+var never_in_check=[true,true]
+var can_en_passant=[8,8];//which pawn can be en passanted
 
-
-//class of chess squares
-/*
-class chess_square{
-	constructor(x, y, occupied){
-		this.x = x;
-		this.y = y;
-		this.occupied = occupied;
-	}
-	get_x(){
-		return this.x;
-	}
-	get_y(){
-		return this.y;
-	}
-	get_occ(){
-		return this.occupied;
-	}
-}*/
-//class of chess squares not required so far
 
 var chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 
@@ -231,12 +213,14 @@ class chess_piece{
 				if (this.y==6&&my_chessboard[this.x][this.y-2]==0) poss.push([this.x,this.y-2]);
 				if (this.x<7&&this.opp_colour(my_chessboard[this.x+1][this.y-1])) poss.push([this.x+1,this.y-1]);
 				if (this.x>0&&this.opp_colour(my_chessboard[this.x-1][this.y-1])) poss.push([this.x-1,this.y-1]);
+				if (this.y==3&&can_en_passant[1]==3&&(this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],2]);
 			}
 			else{
 				if (my_chessboard[this.x][this.y+1]==0) poss.push([this.x,this.y+1]);
 				if (this.y==1&&my_chessboard[this.x][this.y+2]==0) poss.push([this.x,this.y+2]);
 				if (this.x<7&&this.opp_colour(my_chessboard[this.x+1][this.y+1])) poss.push([this.x+1,this.y+1]);
 				if (this.x>0&&this.opp_colour(my_chessboard[this.x-1][this.y+1])) poss.push([this.x-1,this.y+1]);
+				if (this.y==4&&can_en_passant[1]==4&&(this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],5]);
 			}
 
 
@@ -328,7 +312,8 @@ class chess_piece{
 									}
 								}
 							}
-							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color)){
+							never_in_check[(this.color=="d")]=never_in_check[(this.color=="d")]&&!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)
+							if(never_in_check[(this.color=="d")]){
 								actual_poss.push([6, k_row]);
 							}
 						}
@@ -393,7 +378,8 @@ class chess_piece{
 									}
 								}
 							}
-							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
+							never_in_check[(this.color=="d")]=never_in_check[(this.color=="d")]&&!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)
+							if(never_in_check[(this.color=="d")]){
 								actual_poss.push([2, k_row]);
 							}
 						}
@@ -465,19 +451,24 @@ chessboard[4][0].draw();
 function coverup(i, j){
 //use this as a last resort
 	chessboard[i][j] = 0;
-	let file_name = "ls.png"
-	if((i+j)%2!=0){file_name = "ds.png";}
-	this.image=fabric.Image.fromURL(file_name, function(img){
-			img.set({
-				left: 62.5*i,
-				top: 62.5*j,
-				width: 62.5,
-				height: 62.5,
-				selectable: false,
-				opacity: 1
-			})
-			canvas.add(img);
-		});
+	var col;
+	if((i+j)%2 == 1){
+		col = "#654321";
+	}
+	else{
+		col = "#c4a484";
+	}
+	var rect = new fabric.Rect({
+		left: 62.5*i,
+		top: 62.5*j,
+		fill: col,
+		width: 62.5,
+		height: 62.5,
+		selectable: false
+	});
+	canvas.remove(shade_piece);
+	canvas.add(rect);
+	canvas.add(shade_piece);
 }
 
 move_to = [8, 8]; //square to which piece is to be moved
@@ -491,7 +482,7 @@ legal_moves = [];
 var legal_moves_graphics=[];
 var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
 canvas.add(shade_piece);
-
+var bkcastle=true,bqcastle=true,wkcastle=true,wqcastle=true;
 
 canvas.on("mouse:down", function(options) {
 //main game loop
@@ -502,11 +493,8 @@ canvas.on("mouse:down", function(options) {
 			canvas.remove(legal_moves_graphics[indexor]);
 		}
 		if(!(move_to[0] == moved_from[0] && move_to[1] == moved_from[1])){
-			//legal_moves = chessboard[moved_from[0]][moved_from[1]].moves();
 			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
-				/*to_be_moved.set("left", -3+62.5*8);
-				to_be_moved.set("top", -3+62.5*8);*/
 				//console.log(chessboard[moved_from[0]][moved_from[1]]);
 				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
 				let nm = chessboard[moved_from[0]][moved_from[1]].get_num_moves();
@@ -515,34 +503,28 @@ canvas.on("mouse:down", function(options) {
 				//console.log(chessboard[move_to[0]][move_to[1]]);
 				if(!(chessboard[move_to[0]][move_to[1]]==0)){
 					//console.log(options.target.type);
-					//canvas.remove(options.target);
 					//console.log(chessboard[move_to[0]][move_to[1]]);
 					coverup(move_to[0], move_to[1]);
 				}
 				if(pc == "p"){
-					if(col == "l"){
-						if(move_to[1]==0){
-							while(true){
-								let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
-								if(input == "q" || input == "b" || input == "n" || input == "r"){
-									pc = input;
-									break;
-								}
-								alert("Your input is invalid (You cannot promote to a king or a pawn)");
+					if((col == "l"&&move_to[1]==0)||(col=="d"&&move_to[1]==7)){	//promotion
+						while(true){
+							let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
+							if(input == "q" || input == "b" || input == "n" || input == "r"){
+								pc = input;
+								break;
 							}
+							alert("Your input is invalid (You cannot promote to a king or a pawn)");
 						}
 					}
+					//en passant
+					else if (moved_from[1]==can_en_passant[1]&&move_to[0]==can_en_passant[0]){
+						coverup(can_en_passant[0],can_en_passant[1]);
+						can_en_passant=[8,8];
+					}
 					else{
-						if(move_to[1]==7){
-							while(true){
-								let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
-								if(input == "q" || input == "b" || input == "n" || input == "r"){
-									pc = input;
-									break;
-								}
-								alert("Your input is invalid (You cannot promote to a king or a pawn)");
-							}
-						}
+						if ((col == "d"&&moved_from[1]==1&&move_to[1]==3)||(col=="l"&&moved_from[1]==6&&move_to[1]==4)) {can_en_passant[0]=move_to[0];can_en_passant[1]=move_to[1];}
+						else can_en_passant=[8,8];
 					}
 				}
 				if(pc == "k"){
@@ -590,6 +572,8 @@ canvas.on("mouse:down", function(options) {
 		}
 	}
 	else{
+		
+		
 	//choosing the piece
 		moved_from = get_square(options.e.clientX, options.e.clientY);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
@@ -609,7 +593,6 @@ canvas.on("mouse:down", function(options) {
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
 					legal_moves_graphics[indexor]= new fabric.Circle({radius:11.25, fill:"#00CC00",opacity:0.3, left:62.5*legal_moves[indexor][0]+20,top:62.5*legal_moves[indexor][1]+20});
 					canvas.add(legal_moves_graphics[indexor]);
-					//canvas.sendToBack(legal_moves_graphics[indexor]);
 				}
 			}
 		}
