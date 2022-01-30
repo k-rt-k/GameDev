@@ -55,7 +55,6 @@ function is_in_check(chessboard, col){
 	return false;
 }
 
-var never_in_check=[true,true]
 var can_en_passant=[8,8];//which pawn can be en passanted
 
 
@@ -312,8 +311,7 @@ class chess_piece{
 									}
 								}
 							}
-							never_in_check[(this.color=="d")]=never_in_check[(this.color=="d")]&&!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)
-							if(never_in_check[(this.color=="d")]){
+							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)]){
 								actual_poss.push([6, k_row]);
 							}
 						}
@@ -378,8 +376,7 @@ class chess_piece{
 									}
 								}
 							}
-							never_in_check[(this.color=="d")]=never_in_check[(this.color=="d")]&&!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)
-							if(never_in_check[(this.color=="d")]){
+							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
 								actual_poss.push([2, k_row]);
 							}
 						}
