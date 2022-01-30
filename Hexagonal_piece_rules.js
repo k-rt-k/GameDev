@@ -11,7 +11,7 @@ var canvas = new fabric.Canvas('c', {
 */
 /*tranformation from coord to location: 
 	x=CENTERX+UNIT_LENGTH*((x-5)+y/2-z/2)
-	y=CENTERY-UNIT_LENGTH*((y+z-10)*1.732/2)
+	y=CENTERY-UNIT_LENGTH*((y+z-10)*SQRT3/2)
 */
 //white taken towards 0 side
 let z =(x,y)=>5+y-x;
@@ -19,19 +19,32 @@ let y=(x,z)=>x+z-5;
 const CENTERX= canvas.width/2;//change
 const CENTERY= canvas.height/2;
 const UNIT_LENGTH=canvas.height/20;
+const SQRT3=Math.sqrt(3);
 
 let hekcenterx=(x,y)=>CENTERX+UNIT_LENGTH*3*(x-5)/2;
-let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*(2*y-x-5)*1.732/2;
+let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*(2*y-x-5)*SQRT3/2;
 
 function all_in_bounds(x,y){
     zee=z(x,y);
     return (x>=0 && x<11 && y>=0 && y<11 && zee>=0 && zee<11);
 }
-
-function get_hex(x_coord,y_coord){
-	let X = Math.floor(2*(x_coord-CENTERX)/(UNIT_LENGTH*3))+5;
-	let Y = Math.ceil((X+5 + 2*(CENTERY-y_coord)/(UNIT_LENGTH*1.732))/2);
-	return [X,Y];
+function dis2center(X,Y,x_coord,y_coord){
+	return (x_coord-hekcenterx(X,Y))*(x_coord-hekcenterx(X,Y))+(y_coord-hekcentery(X,Y))*(y_coord-hekcentery(X,Y));
+}
+function get_hex(x_coord,y_coord){	
+	var X = Math.floor(2*(x_coord+UNIT_LENGTH-CENTERX)/(UNIT_LENGTH*3))+5;
+	var Y = Math.floor((X+6+(2*CENTERY/SQRT3 -y_coord)/UNIT_LENGTH)/2);
+	var closest=[X,Y]; var mind= dis2center(X,Y,x_coord,y_coord);
+	for (i=-2;i<3;i++){
+		for (j=-2;j<3;j++){
+			var dis=dis2center(X-i,Y-j,x_coord,y_coord);
+			if (mind>dis){
+				closest=[X-i,Y-j];
+				mind=dis;
+			}
+		}	
+	}
+	return closest;
 }
 
 function my_includes(legal_moves, move_to){
@@ -58,11 +71,11 @@ function coverup(i, j){
 		}
 		var hexy = new fabric.Polygon([
 			{ x: X-UNIT_LENGTH, y: Y },
-			{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2 },
-			{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2},
+			{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
+			{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2},
 			{ x: X+UNIT_LENGTH, y: Y},
-			{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2},
-			{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2}],{
+			{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2},
+			{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2}],{
 			fill: col,
 			selectable: false
 		});
@@ -84,7 +97,7 @@ class chess_piece{
 		fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
 				left: CENTERX+UNIT_LENGTH*3*(x-5)/2 -UNIT_LENGTH*0.75,
-				top:  CENTERY-UNIT_LENGTH*(2*y-x-5)*1.732/2 -UNIT_LENGTH*0.75 ,
+				top:  CENTERY-UNIT_LENGTH*(2*y-x-5)*SQRT3/2 -UNIT_LENGTH*0.75 ,
 				scaleX:1.5*UNIT_LENGTH/68,
 				scaleY:1.5*UNIT_LENGTH/68,
 				selectable: false,
@@ -283,12 +296,12 @@ function is_in_check(chessboard, col){
 	for(let i = 0; i<11; i++){
 		for(let j = 0; j<11; j++){
 			if(!all_in_bounds(i,j)||chessboard[i][j]==0){continue;}
-			if(chessboard[i][j].get_color()!=col){continue;}
+			if(!(chessboard[i][j].get_color()==col)){continue;}
 			if(chessboard[i][j].get_piece()!="k"){continue;}
 			k_coords = [i, j];
 			break;
 		}
-		if(k_coords[0]!=8){break;}
+		if(k_coords[0]!=-1){break;}
 	}
 	for(let i = 0; i<11; i++){
 		for(let j = 0; j<11; j++){
@@ -327,15 +340,21 @@ for(let i = 0; i < 11; i++){
 			}
 			var hexy = new fabric.Polygon([
 				{ x: X-UNIT_LENGTH, y: Y },
-				{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2 },
-				{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*1.732/2},
+				{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
+				{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2},
 				{ x: X+UNIT_LENGTH, y: Y},
-				{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2},
-				{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*1.732/2}],{
+				{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2},
+				{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2}],{
 				fill: col,
 				selectable: false
 			});
 			canvas.add(hexy);
+			/*var test=new fabric.Circle({
+				radius:5,
+				left: hekcenterx(i+0.5,j+0.5)-5,
+				top: hekcentery(i+0.5,j+0.5)-5,
+			});
+			canvas.add(test);*/
 	}
 	}
 }
@@ -398,7 +417,7 @@ function f_legal_moves(this_chessboard, col){
 	for(let i = 0; i<11; i++){
 		for(let j = 0; j<11; j++){
 			if(!all_in_bounds(i,j)||this_chessboard[i][j] == 0){continue;}
-			if(this_chessboard[i][j].get_color()!=col){continue;}
+			if(!(this_chessboard[i][j].get_color()==col)){continue;}
 			if(this_chessboard[i][j].moves().length!=0){
 				return true;
 			}
@@ -417,7 +436,17 @@ col=0;
 to_be_moved = 0;
 legal_moves = [];
 var legal_moves_graphics=[];
-var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
+var shade_piece = new fabric.Polygon([
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0},
+	{ x: 0, y: 0},
+	{ x: 0, y: 0},
+	{ x: 0, y: 0}],{
+	fill: "#00cc00",
+	opacity: 0.4,
+	selectable: false
+});
 canvas.add(shade_piece);
 
 
@@ -475,7 +504,7 @@ canvas.on("mouse:down", function(options) {
 		}
 		move_to = [-1,-1];
 		selected = false;
-		shade_piece.set({width:0, height:0});
+		shade_piece.set([]);
 		to_be_moved = 0;
 		if(!f_legal_moves(chessboard, w_b[white_move])){
 			if(white_move==0){
@@ -497,21 +526,23 @@ canvas.on("mouse:down", function(options) {
 		}
 	}
 	else{
-		if(options.target.type == "image"){
-			moved_from = get_hex(options.e.clientX, options.e.clientY);
+		moved_from = get_hex(options.e.clientX, options.e.clientY);
+		console.log(moved_from);
+		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){		
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
 			if (col==w_b[white_move]){
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
-				shade_piece.set({
-					left: CENTERX+UNIT_LENGTH*3*(moved_from[0]-5)/2 -20,
-					top:  CENTERY-UNIT_LENGTH*(2*moved_from[1]-moved_from[0]-5)*1.732/2 -20 ,	
-					width: 40,
-					height: 40,
-				});
+				let X=hekcenterx(moved_from[0],moved_from[0]), Y=hekcentery(moved_from[0],moved_from[0]);
+				shade_piece.set([{ x: X-UNIT_LENGTH, y: Y },
+					{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
+					{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2},
+					{ x: X+UNIT_LENGTH, y: Y},
+					{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2},
+					{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2}]);
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:10, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -10 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*1.732/2 -10});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:10, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -10 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*SQRT3/2 -10});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
 
