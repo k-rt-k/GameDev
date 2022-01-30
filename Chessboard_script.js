@@ -311,7 +311,7 @@ class chess_piece{
 									}
 								}
 							}
-							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)]){
+							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
 								actual_poss.push([6, k_row]);
 							}
 						}
