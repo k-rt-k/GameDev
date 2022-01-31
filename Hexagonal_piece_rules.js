@@ -30,6 +30,7 @@ const CENTERY= canvas.height/2;
 const UNIT_LENGTH=canvas.height/20;
 const SQRT3=Math.sqrt(3);
 
+
 let hekcenterx=(x,y)=>CENTERX+UNIT_LENGTH*3*(x-5)/2;
 let hekcentery=(x,y)=>CENTERY-UNIT_LENGTH*(2*y-x-5)*SQRT3/2;
 
@@ -65,19 +66,20 @@ function my_includes(legal_moves, move_to){
 	return false;
 }
 function coverup(i, j){
-	//use this as a last resort
+	//use this as a last resort (or not ;) )
 		chessboard[i][j] = 0;
 		let X=hekcenterx(i,j);
 		let Y=hekcentery(i,j);
+		let col = "#c4a484";
 		if((i+j)%3 == 2){
 			col = "#654321";
 		}
 		else if((i+j)%3==1){
 			col="#875d33";
 		}
-		else{
+		/*else{
 			col = "#c4a484";
-		}
+		}*/
 		var hexy = new fabric.Polygon([
 			{ x: X-UNIT_LENGTH, y: Y },
 			{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
@@ -279,7 +281,7 @@ class chess_piece{
 		let poss = this.poss_moves(chessboard);
 		var actual_poss = [];
 		for(let i = 0; i<poss.length; i++){
-			var new_chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+			var new_chessboard = [[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0]];
 			for(let p = 0; p<8; p++){
 				for(let q = 0; q<8; q++){
 					if(p==this.x && q==this.y){
@@ -294,8 +296,8 @@ class chess_piece{
 				}
 			}
 			if(!is_in_check(new_chessboard, this.color)){actual_poss.push(poss[i]);}
-		return actual_poss;
 		}
+		return actual_poss;
 	}
 };
 
@@ -304,7 +306,10 @@ function is_in_check(chessboard, col){
 	let k_coords = [-1,-1];
 	for(let i = 0; i<11; i++){
 		for(let j = 0; j<11; j++){
-			if((!all_in_bounds(i,j))||(chessboard[i][j]==0)){continue;}
+			if((!all_in_bounds(i,j))){continue;}
+			if(chessboard[i][j]==0){continue;}
+			//console.log(i, j, all_in_bounds(i, j));
+			//console.log(chessboard[3][8]);
 			if(!(chessboard[i][j].get_color()==col)){continue;}
 			if(chessboard[i][j].get_piece()!="k"){continue;}
 			k_coords = [i, j];
@@ -367,7 +372,7 @@ for(let i = 0; i < 11; i++){
 	}
 	}
 }
-
+//console.log(chessboard[3][8]);
 //This is Glinsky's Hexagonal chess variant, many others exist
 //piece initialisation
 
@@ -503,6 +508,7 @@ canvas.on("mouse:down", function(options) {
 					}
 					
 				}
+				console.log(col);
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
@@ -538,11 +544,12 @@ canvas.on("mouse:down", function(options) {
 		moved_from = get_hex(options.e.clientX, options.e.clientY);
 		console.log(chessboard[moved_from[0]][moved_from[1]]);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){		
-			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
+			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
 			if (col==w_b[white_move]){
 				to_be_moved = options.target;
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
+				console.log(chessboard[moved_from[0]][moved_from[1]].moves());
 				let X=hekcenterx(moved_from[0],moved_from[0]), Y=hekcentery(moved_from[0],moved_from[0]);
 				shade_piece.set([{ x: X-UNIT_LENGTH, y: Y },
 					{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
@@ -550,6 +557,7 @@ canvas.on("mouse:down", function(options) {
 					{ x: X+UNIT_LENGTH, y: Y},
 					{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2},
 					{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2}]);
+				console.log(legal_moves);
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
 					legal_moves_graphics[indexor]= new fabric.Circle({radius:10, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -10 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*SQRT3/2 -10});
 					canvas.add(legal_moves_graphics[indexor]);
