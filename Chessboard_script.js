@@ -22,11 +22,18 @@ function get_square(coor_x, coor_y){
 
 function my_includes(legal_moves, move_to){
 	for(let i = 0; i<legal_moves.length; i++){
-		if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){
-			return true;
+		if(legal_moves[i].length == 3 && move_to.length == 3){
+			if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1] && legal_moves[i][2] == move_to[2]){return true;}
+		}
+		else{
+			if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){return true;}	
 		}
 	}
 	return false;
+}
+
+function is_in_chessboard(x, y){
+	return (x>=0 && x<8 && y>=0 && y<8);
 }
 
 function is_in_check(chessboard, col){
@@ -259,122 +266,100 @@ class chess_piece{
 		}
 		if(this.piece=="k"){
 			if(this.num_moves==0){
-				let k_row = 0;
-				if(this.color=="l"){
-					k_row = 7;
-				}
-				if(chessboard[7][k_row]!=0){
-					if(chessboard[7][k_row].get_num_moves()==0){
-						if(chessboard[5][k_row]==0 && chessboard[6][k_row]==0){
-							let chessboard1 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard1[i][j] = 0;
-									}
-									else if(i == 5 && j == k_row){
-										chessboard1[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard1[i][j] = chessboard[i][j];
-									}
-								}
-							}
-							let chessboard2 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard2[i][j] = 0;
-									}
-									else if(i == 6 && j == k_row){
-										chessboard2[i][j] = chessboard[4][7];
+				if(!is_in_check(chessboard, this.color)){
+					let rooks_available = [];
+					for(let i = 0; i<8; i++){
+						if(chessboard[i][this.y]!=0){
+							if(chessboard[i][this.y].get_piece()=="r"){
+								if(chessboard[i][this.y].get_num_moves()==0){
+									let this_var = true;
+									if(i>this.x){
+									//castling h-side
+										for(let j = Math.min(this.x, 6); j<=Math.max(this.x, 6); j++){
+											if(chessboard[j][this.y]!=0 && j!=this.x && j!=i){
+												this_var = false;
+											}
+										}
+										for(let j = Math.min(i, 5); j<=Math.max(i, 5); j++){
+											if(chessboard[j][this.y]!=0 && j!=this.x && j!=i){
+												this_var = false;
+											}
+										}
 									}
 									else{
-										chessboard2[i][j] = chessboard[i][j];
+									//castling a-side
+										for(let j = Math.min(this.x, 2); j<=Math.max(this.x, 2); j++){
+											if(chessboard[j][this.y]!=0 && j!=this.x && j!=i){
+												this_var = false;
+											}
+										}
+										for(let j = Math.min(i, 3); j<=Math.max(i, 3); j++){
+											if(chessboard[j][this.y]!=0 && j!=this.x && j!=i){
+												this_var = false;
+											}
+										}
+									}
+									if(this_var){
+										rooks_available.push(chessboard[i][this.y]);
 									}
 								}
-							}
-							let chessboard3 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard3[i][j] = 0;
-									}
-									else if(i == 7 && j == k_row){
-										chessboard3[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard3[i][j] = chessboard[i][j];
-									}
-								}
-							}
-							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
-								actual_poss.push([6, k_row]);
 							}
 						}
 					}
-				}
-				if(chessboard[0][k_row]!=0){
-					if(chessboard[0][k_row].get_num_moves()==0){
-						if(chessboard[1][k_row] == 0 && chessboard[2][k_row] == 0 && chessboard[3][k_row] == 0){
-							let chessboard1 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard1[i][j] = 0;
-									}
-									else if(i == 3 && j == k_row){
-										chessboard1[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard1[i][j] = chessboard[i][j];
-									}
-								}
-							}
-							let chessboard2 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard2[i][j] = 0;
-									}
-									else if(i == 2 && j == k_row){
-										chessboard2[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard2[i][j] = chessboard[i][j];
+					for(let i = 0; i<rooks_available.length; i++){
+						let rook_x = rooks_available[i].get_x();
+						let chessboard_for_checking = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
+						let can_castle = true;
+						if(rook_x > this.x){
+						//castling h-side
+							for(let j = Math.min(this.x, 6); j<=Math.max(this.x, 6); j++){
+								if(j!=this.x){
+									for(let p = 0; p<8; p++){
+										for(let q = 0; q<8; q++){
+											if(p==this.x && q==this.y){
+												chessboard_for_checking[p][q] = 0;
+											}
+											else if(p == j && q==this.y){
+												chessboard_for_checking[p][q] = chessboard[this.x][this.y];
+											}
+											else{
+												chessboard_for_checking[p][q] = chessboard[p][q];
+											}
+										}
 									}
 								}
-							}
-							let chessboard3 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard3[i][j] = 0;
-									}
-									else if(i == 1 && j == k_row){
-										chessboard3[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard3[i][j] = chessboard[i][j];
-									}
+								if(is_in_check(chessboard_for_checking, this.color)){
+									can_castle = false;
 								}
 							}
-							let chessboard4 = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
-							for(let i = 0; i<8; i++){
-								for(let j = 0; j<8; j++){
-									if(i == 4 && j == k_row){
-										chessboard4[i][j] = 0;
-									}
-									else if(i == 0 && j == k_row){
-										chessboard4[i][j] = chessboard[4][7];
-									}
-									else{
-										chessboard4[i][j] = chessboard[i][j];
+							if(can_castle){
+								actual_poss.push([6, this.y, "ch"]);
+							}
+						}
+						else{
+						//castling a-side
+							for(let j = Math.min(this.x, 2); j<=Math.max(this.x, 2); j++){
+								if(j!=this.x){
+									for(let p = 0; p<8; p++){
+										for(let q = 0; q<8; q++){
+											if(p==this.x && q==this.y){
+												chessboard_for_checking[p][q] = 0;
+											}
+											else if(p == j && q==this.y){
+												chessboard_for_checking[p][q] = chessboard[this.x][this.y];
+											}
+											else{
+												chessboard_for_checking[p][q] = chessboard[p][q];
+											}
+										}
 									}
 								}
+								if(is_in_check(chessboard_for_checking, this.color)){
+									can_castle = false;
+								}
 							}
-							if(!is_in_check(chessboard, this.color) && !is_in_check(chessboard1, this.color) && !is_in_check(chessboard2, this.color) && !is_in_check(chessboard3, this.color) && !is_in_check(chessboard4, this.color)){
-								actual_poss.push([2, k_row]);
+							if(can_castle){
+								actual_poss.push([2, this.y, "ca"]);
 							}
 						}
 					}
@@ -434,7 +419,7 @@ for(let i = 0; i<2; i++){
 	chessboard[2+3*i][0].draw();
 }
 chessboard[3][7] = new chess_piece(3, 7, "l", "q", 0);
-let x = chessboard[3][7].draw();
+chessboard[3][7].draw();
 chessboard[3][0] = new chess_piece(3, 0, "d", "q", 0);
 chessboard[3][0].draw();
 chessboard[4][7] = new chess_piece(4, 7, "l", "k", 0);
@@ -522,7 +507,90 @@ canvas.on("mouse:down", function(options) {
 					}
 				}
 				if(pc == "k"){
-					if(move_to[0]-moved_from[0] == 2){
+					if(move_to[0] == 6){
+					//h-side castling
+						if(my_includes(legal_moves, [move_to[0], move_to[1], "ch"])){
+							let should_castle = false;
+							if(move_to[0]-moved_from[0] == 1 || move_to[0]-moved_from[0] == -1){
+								while(true){
+									let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
+									if(input == "y"){
+										should_castle = true;
+										for(let i = moved_from[0]; i<8; i++){
+											if(chessboard[i][moved_from[1]]!=0){
+												if(chessboard[i][moved_from[1]].get_color()==col && chessboard[i][moved_from[1]].get_piece()=="r"){
+													coverup(i, moved_from[1]);
+													break;
+												}
+											}
+										}
+										break;
+									}
+									else if(input == "n"){
+										break;
+									}
+									alert("Your input is invalid (Enter either 'y' or 'n')");
+								}
+							}
+							else{
+								should_castle = true;
+								for(let i = moved_from[0]; i<8; i++){
+									if(chessboard[i][moved_from[1]]!=0){
+										if(chessboard[i][moved_from[1]].get_color()==col && chessboard[i][moved_from[1]].get_piece()=="r"){
+											coverup(i, moved_from[1]);
+										}
+									}
+								}
+							}
+							if(should_castle){
+								chessboard[5][move_to[1]] = new chess_piece(5, move_to[1], col, "r", 1);
+								chessboard[5][move_to[1]].draw();
+							}
+						}
+					}
+					else if(move_to[0] == 2){
+					//a-side castling
+						if(my_includes(legal_moves, [move_to[0], move_to[1], "ca"])){
+							let should_castle = false;
+							if(move_to[0] - moved_from[0] == 1 || move_to[0] - moved_from[0] == -1){
+								while(true){
+									let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
+									if(input == "y"){
+										should_castle = true;
+										for(let i = moved_from[0]; i>=0; i--){
+											if(chessboard[i][moved_from[1]]!=0){
+												if(chessboard[i][moved_from[1]].get_color()==col && chessboard[i][moved_from[1]].get_piece()=="r"){
+													coverup(i, moved_from[1]);
+													break;
+												}
+											}
+										}
+										break;
+									}
+									else if(input == "n"){
+										break;
+									}
+									alert("Your input is invalid (Enter either 'y' or 'n')");
+								}
+							}
+							else{
+								should_castle = true;
+								for(let i = moved_from[0]; i>=0; i--){
+									if(chessboard[i][moved_from[1]]!=0){
+										if(chessboard[i][moved_from[1]].get_color()==col && chessboard[i][moved_from[1]].get_piece()=="r"){
+											coverup(i, moved_from[1]);
+											break;
+										}
+									}
+								}
+							}
+							if(should_castle){
+								chessboard[3][move_to[1]] = new chess_piece(3, move_to[1], col, "r", 1);
+								chessboard[3][move_to[1]].draw();
+							}
+						}
+					}
+					/*if(move_to[0]-moved_from[0] == 2){
 						chessboard[move_to[0]-1][move_to[1]] = new chess_piece(move_to[0]-1, move_to[1], col, "r", 1);
 						chessboard[move_to[0]-1][move_to[1]].draw();
 						coverup(7, move_to[1]);
@@ -531,7 +599,7 @@ canvas.on("mouse:down", function(options) {
 						chessboard[move_to[0]+1][move_to[1]] = new chess_piece(move_to[0]+1, move_to[1], col, "r", 1);
 						chessboard[move_to[0]+1][move_to[1]].draw();
 						coverup(0, move_to[1]);
-					}
+					}*/
 				}
 				//console.log(moved_from[0], moved_from[1]);
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, nm+1);
@@ -540,6 +608,66 @@ canvas.on("mouse:down", function(options) {
 				legal_moves = [];
 				moved_from = 0;
 				white_move = 1-white_move;
+			}
+		}
+		else{
+			if(chessboard[move_to[0]][move_to[1]]!=0){
+				if(chessboard[move_to[0]][move_to[1]].get_piece()=="k"){
+					if(move_to[0]==6){
+						if(my_includes(legal_moves, [6, move_to[1], "ch"])){
+							while(true){
+								let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
+								if(input == "y"){
+									for(let i = move_to[0]; i<8; i++){
+										if(chessboard[i][move_to[1]]!=0){
+											if(chessboard[i][move_to[1]].get_color()==chessboard[move_to[0]][move_to[1]].get_color() && chessboard[i][moved_from[1]].get_piece()=="r"){
+												coverup(i, move_to[1]);
+												break;
+											}
+										}
+									}
+									chessboard[5][move_to[1]] = new chess_piece(5, move_to[1], chessboard[move_to[0]][move_to[1]].get_color(), "r", 1);
+									chessboard[5][move_to[1]].draw();
+									legal_moves = [];
+									moved_from = 0;
+									white_move = 1-white_move;
+									break;
+								}
+								else if(input == "n"){
+									break;
+								}
+								alert("Your input is invalid (Enter either 'y' or 'n')");
+							}
+						}
+					}
+					else if(move_to[0]==2){
+						if(my_includes(legal_moves, [2, move_to[1], "ca"])){
+							while(true){
+								let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
+								if(input == "y"){
+									for(let i = move_to[0]; i>=0; i--){
+										if(chessboard[i][move_to[1]]!=0){
+											if(chessboard[i][move_to[1]].get_color()==chessboard[move_to[0]][move_to[1]].get_color() && chessboard[i][moved_from[1]].get_piece()=="r"){
+												coverup(i, move_to[1]);
+												break;
+											}
+										}
+									}
+									chessboard[3][move_to[1]] = new chess_piece(3, move_to[1], chessboard[move_to[0]][move_to[1]].get_color(), "r", 1);
+									chessboard[3][move_to[1]].draw();
+									legal_moves = [];
+									moved_from = 0;
+									white_move = 1-white_move;
+									break;
+								}
+								else if(input == "n"){
+									break;
+								}
+								alert("Your input is invalid (Enter either 'y' or 'n')");
+							}
+						}
+					}
+				}
 			}
 		}
 		move_to = [8, 8];
@@ -566,11 +694,9 @@ canvas.on("mouse:down", function(options) {
 		}
 	}
 	else{
-		
-		
 	//choosing the piece
 		moved_from = get_square(options.e.clientX, options.e.clientY);
-		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){
+		if(options.target.type == "image" && is_in_chessboard(moved_from[0], moved_from[1]) && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
 			//console.log(chessboard[moved_from[0]][moved_from[1]]);
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
