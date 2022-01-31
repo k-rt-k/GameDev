@@ -1,7 +1,11 @@
 var canvas = new fabric.Canvas('c', {
   preserveObjectStacking: true
 });
+
 const SQUARE_WIDTH=62.5;
+const CENTERX=canvas.width/2;
+const CENTERY=canvas.height/2;
+
 /*function get_image(x, y) {
 //use this only if you are sure that an image exists at that point
 	var objArray = canvas.getObjects();
@@ -14,8 +18,8 @@ const SQUARE_WIDTH=62.5;
 
 function get_square(coor_x, coor_y){
 //returns the square in which (coor_x, coor_y) 
-	p = Math.floor(coor_x/ SQUARE_WIDTH);
-	q = Math.floor(coor_y/ SQUARE_WIDTH);
+	p = Math.floor((coor_x-CENTERX)/ SQUARE_WIDTH)+4;
+	q = Math.floor((coor_y-CENTERY)/ SQUARE_WIDTH)+4;
 	return [p, q];
 }
 
@@ -80,8 +84,8 @@ for(let i = 0; i < 8; i++){
 			col = "#c4a484";
 		}
 		var rect = new fabric.Rect({
-			left:  SQUARE_WIDTH*i,
-			top:  SQUARE_WIDTH*j,
+			left:  CENTERX+SQUARE_WIDTH*(i-4),
+			top:  CENTERY+SQUARE_WIDTH*(j-4),
 			fill: col,
 			width:  SQUARE_WIDTH,
 			height:  SQUARE_WIDTH,
@@ -108,8 +112,8 @@ class chess_piece{
 		let pc = this.pc;
 		this.image=fabric.Image.fromURL(this.piece+this.color+"t.png", function(img){
 			img.set({
-				left: SQUARE_WIDTH*x,
-				top: SQUARE_WIDTH*y,
+				left: CENTERX+SQUARE_WIDTH*(x-4),
+				top: CENTERY+SQUARE_WIDTH*(y-4),
 				scaleX:SQUARE_WIDTH/68,
 				scaleY:SQUARE_WIDTH/68,
 				selectable: false,
@@ -438,8 +442,8 @@ function coverup(i, j){
 		col = "#c4a484";
 	}
 	var rect = new fabric.Rect({
-		left:  SQUARE_WIDTH*i,
-		top:  SQUARE_WIDTH*j,
+		left:  CENTERX+SQUARE_WIDTH*(i-4),
+		top:  CENTERY+SQUARE_WIDTH*(j-4),
 		fill: col,
 		width:  SQUARE_WIDTH,
 		height:  SQUARE_WIDTH,
@@ -705,13 +709,13 @@ canvas.on("mouse:down", function(options) {
 				selected = true; 
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
 				shade_piece.set({
-					left:  SQUARE_WIDTH*moved_from[0],
-					top:  SQUARE_WIDTH*moved_from[1],	
+					left: CENTERX+SQUARE_WIDTH*(moved_from[0]-4),
+					top:  CENTERY+SQUARE_WIDTH*(moved_from[1]-4),	
 					width:  SQUARE_WIDTH,
 					height:  SQUARE_WIDTH
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/4, fill:"#00CC00",opacity:0.3, left: SQUARE_WIDTH*legal_moves[indexor][0]+SQUARE_WIDTH/4,top: SQUARE_WIDTH*legal_moves[indexor][1]+SQUARE_WIDTH/4});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/8, fill:"#00CC00",opacity:0.3, left: CENTERX+SQUARE_WIDTH*(legal_moves[indexor][0]-4)+3*SQUARE_WIDTH/8,top: CENTERY+SQUARE_WIDTH*(legal_moves[indexor][1]-4)+3*SQUARE_WIDTH/8});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
 			}
