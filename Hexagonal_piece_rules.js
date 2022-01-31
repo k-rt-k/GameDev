@@ -3,7 +3,16 @@
 var canvas = new fabric.Canvas('c', {
 	preserveObjectStacking: true
   });
- 
+let shadow = new fabric.Rect({
+	left:0,
+	top:0,
+	width:canvas.width,
+	height:canvas.height,
+	fill:"#000000",
+	opacity=0.4,
+	selectable:false
+});
+	canvas.add(shadow);
 /* coordinates
          y10/\
           y0| |
