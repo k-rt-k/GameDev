@@ -3,7 +3,7 @@
 var canvas = new fabric.Canvas('c', {
 	preserveObjectStacking: true
   });
-let shadow = new fabric.Rect({
+/*let shadow = new fabric.Rect({
 	left:0,
 	top:0,
 	width:canvas.width,
@@ -12,7 +12,7 @@ let shadow = new fabric.Rect({
 	opacity=0.4,
 	selectable:false
 });
-	canvas.add(shadow);
+	canvas.add(shadow);*/
 /* coordinates
          y10/\
           y0| |
@@ -244,18 +244,19 @@ class chess_piece{
 		else if (this.piece=="p"){
 			if (this.color=="l"){
 				if (chessboard[this.x][this.y+1]==0) poss.push([this.x,this.y+1]);
-				if ((this.y==4||z(this.x,this.y)==4) && chessboard[this.x][this.y+2]==0) poss.push([this.x,this.y+2]);
-				if (all_in_bounds(this.x+1,this.y) && this.opp_colour(chessboard[this.x+1][this.y])) poss.push([this.x+1,this.y]);
-				if (all_in_bounds(this.x-1,this.y-1) && this.opp_colour(chessboard[this.x-1][this.y-1])) poss.push([this.x-1,this.y-1]);
+				if ((this.y==4&&z(this.x,this.y)<=4||z(this.x,this.y)==4&&this.y<=4) && chessboard[this.x][this.y+2]==0) poss.push([this.x,this.y+2]);
+				if (all_in_bounds(this.x+1,this.y+1) && this.opp_colour(chessboard[this.x+1][this.y+1])) poss.push([this.x+1,this.y+1]);
+				if (all_in_bounds(this.x-1,this.y) && this.opp_colour(chessboard[this.x-1][this.y])) poss.push([this.x-1,this.y]);
 				//if (this.y==3 && can_en_passant[1]==3 && (this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],2]);
-				if ((((this.x+1)==can_en_passant[0] && (this.y+1)==can_en_passant[1])||((this.x-1)==can_en_passant[0] && this.y==can_en_passant[1])) && this.opp_colour(chessboard[can_en_passant[0]][can_en_passant[1]])) poss.push([can_en_passant[0],can_en_passant[1]+1]);
+				if (((this.x-1==can_en_passant[0] && this.y-1==can_en_passant[1])||(this.x+1==can_en_passant[0] && this.y==can_en_passant[1])) && this.opp_colour(chessboard[can_en_passant[0]][can_en_passant[1]])) poss.push([can_en_passant[0],can_en_passant[1]+1]);
+				
 			}
 			else{
 				if (chessboard[this.x][this.y-1]==0) poss.push([this.x,this.y-1]);
-				if ((this.y==6||z(this.x,this.y)==6) && chessboard[this.x][this.y-2]==0) poss.push([this.x,this.y-2]);
-				if (all_in_bounds(this.x+1,this.y+1) && this.opp_colour(chessboard[this.x+1][this.y+1])) poss.push([this.x+1,this.y+1]);
-				if (all_in_bounds(this.x-1,this.y) && this.opp_colour(chessboard[this.x-1][this.y])) poss.push([this.x-1,this.y]);
-				if (((this.x+1==can_en_passant[0] && this.y+1==can_en_passant[1])||(this.x-1==can_en_passant[0] && this.y==can_en_passant[1])) && this.opp_colour(chessboard[can_en_passant[0]][can_en_passant[1]])) poss.push([can_en_passant[0],can_en_passant[1]-1]);
+				if ((this.y==6&&z(this.x,this.y)>=6||z(this.x,this.y)==6&&this.y>=6) && chessboard[this.x][this.y-2]==0) poss.push([this.x,this.y-2]);
+				if (all_in_bounds(this.x+1,this.y) && this.opp_colour(chessboard[this.x+1][this.y])) poss.push([this.x+1,this.y]);
+				if (all_in_bounds(this.x-1,this.y-1) && this.opp_colour(chessboard[this.x-1][this.y-1])) poss.push([this.x-1,this.y-1]);			
+				if ((((this.x+1)==can_en_passant[0] && (this.y+1)==can_en_passant[1])||((this.x-1)==can_en_passant[0] && this.y==can_en_passant[1])) && this.opp_colour(chessboard[can_en_passant[0]][can_en_passant[1]])) poss.push([can_en_passant[0],can_en_passant[1]-1]);
 			}
 //if (this.y==3 && can_en_passant[1]==3 && (this.x-can_en_passant[0]==1||this.x-can_en_passant[0]==-1)) poss.push([can_en_passant[0],2]);
 
