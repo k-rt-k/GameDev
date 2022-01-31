@@ -295,7 +295,7 @@ function is_in_check(chessboard, col){
 	let k_coords = [-1,-1];
 	for(let i = 0; i<11; i++){
 		for(let j = 0; j<11; j++){
-			if(!all_in_bounds(i,j)||chessboard[i][j]==0){continue;}
+			if((!all_in_bounds(i,j))||(chessboard[i][j]==0)){continue;}
 			if(!(chessboard[i][j].get_color()==col)){continue;}
 			if(chessboard[i][j].get_piece()!="k"){continue;}
 			k_coords = [i, j];
@@ -527,7 +527,7 @@ canvas.on("mouse:down", function(options) {
 	}
 	else{
 		moved_from = get_hex(options.e.clientX, options.e.clientY);
-		console.log(moved_from);
+		console.log(chessboard[moved_from[0]][moved_from[1]]);
 		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){		
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();		
 			if (col==w_b[white_move]){
