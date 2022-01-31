@@ -2,7 +2,6 @@ var canvas = new fabric.Canvas('c', {
   preserveObjectStacking: true
 });
 
-
 const SQUARE_WIDTH=62.5;
 const CENTERX=canvas.width/2;
 const CENTERY=canvas.height/2;
