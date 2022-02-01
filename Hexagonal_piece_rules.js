@@ -3,16 +3,7 @@
 var canvas = new fabric.Canvas('c', {
 	preserveObjectStacking: true
   });
-/*let shadow = new fabric.Rect({
-	left:0,
-	top:0,
-	width:canvas.width,
-	height:canvas.height,
-	fill:"#000000",
-	opacity=0.4,
-	selectable:false
-});
-	canvas.add(shadow);*/
+
 /* coordinates
          y10/\
           y0| |
@@ -369,12 +360,7 @@ for(let i = 0; i < 11; i++){
 				selectable: false
 			});
 			canvas.add(hexy);
-			/*var test=new fabric.Circle({
-				radius:5,
-				left: hekcenterx(i+0.5,j+0.5)-5,
-				top: hekcentery(i+0.5,j+0.5)-5,
-			});
-			canvas.add(test);*/
+
 	}
 	}
 }
@@ -457,8 +443,9 @@ col=0;
 to_be_moved = 0;
 legal_moves = [];
 var legal_moves_graphics=[];
-var shade_piece = new fabric.Polygon([],{
-	fill: "#00cc00",
+var shade_piece = new fabric.Circle({ 
+	radius:0,
+	fill: "#FFFFFF",
 	opacity: 0.4,
 	selectable: false
 });
@@ -495,7 +482,7 @@ canvas.on("mouse:down", function(options) {
 							}
 							alert("Your input is invalid (You cannot promote to a king or a pawn)");
 						}
-
+						can_en_passant=[-1,-1];
 					}
 
 					//en passant
@@ -506,10 +493,11 @@ canvas.on("mouse:down", function(options) {
 					}
 					else{
 						if ((col == "d" && (moved_from[1]-move_to[1]==2))||(col=="l" && (move_to[1]-moved_from[1]==2))) {can_en_passant[0]=move_to[0];can_en_passant[1]=move_to[1];}
-						else can_en_passant=[8,8];
+						else can_en_passant=[-1,-1];
 					}
 
 				}
+				else can_en_passant=[-1,-1];
 				//console.log(col);
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc);
 				chessboard[move_to[0]][move_to[1]].draw();
@@ -521,7 +509,7 @@ canvas.on("mouse:down", function(options) {
 		}
 		move_to = [-1,-1];
 		selected = false;
-		shade_piece.set([]);
+		shade_piece.set({radius:0});
 		to_be_moved = 0;
 		if(!f_legal_moves(chessboard, w_b[white_move])){
 			if(white_move==0){
@@ -552,16 +540,15 @@ canvas.on("mouse:down", function(options) {
 				selected = true;
 				legal_moves=chessboard[moved_from[0]][moved_from[1]].moves();
 				//console.log(chessboard[moved_from[0]][moved_from[1]].moves());
-				let X=hekcenterx(moved_from[0],moved_from[0]), Y=hekcentery(moved_from[0],moved_from[0]);
-				shade_piece.set([{ x: X-UNIT_LENGTH, y: Y },
-					{ x: X-UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2 },
-					{ x: X+UNIT_LENGTH/2, y: Y+UNIT_LENGTH*SQRT3/2},
-					{ x: X+UNIT_LENGTH, y: Y},
-					{ x: X+UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2},
-					{ x: X-UNIT_LENGTH/2, y: Y-UNIT_LENGTH*SQRT3/2}]);
+				let X=hekcenterx(moved_from[0],moved_from[1]), Y=hekcentery(moved_from[0],moved_from[1]);
+				shade_piece.set({
+					top:Y-UNIT_LENGTH*0.8,
+					left:X-UNIT_LENGTH*0.8,
+					radius:UNIT_LENGTH*0.8
+				});
 				//console.log(legal_moves);
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:10, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -10 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*SQRT3/2 -10});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:UNIT_LENGTH/3, fill:"#00CC00",opacity:0.3, left:CENTERX+UNIT_LENGTH*3*(legal_moves[indexor][0]-5)/2 -UNIT_LENGTH/3 ,top:CENTERY-UNIT_LENGTH*(2*legal_moves[indexor][1]-legal_moves[indexor][0]-5)*SQRT3/2 -UNIT_LENGTH/3});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
 
