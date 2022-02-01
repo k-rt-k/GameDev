@@ -14,5 +14,5 @@ We have implemented castling, promotion, en passant ,checks and only allowing le
 On the standard variant and fischer variant, open the console to see the moves in algebraic chess notation!
 
 
-(tested on google chrome)
+(tested on google chrome and Microsoft Edge)
 
