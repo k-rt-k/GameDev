@@ -3,10 +3,28 @@
     <head>
         <title>960, ceNi_</title>
         <script src="fabric.min.js"></script>
+        <script src="Random_chess.js"></script>
+        <style>
+            body{
+                background-image: url("Wood_bg.jpg");
+                background-size: cover;
+            }
+            canvas{
+                width: 100%;
+                height: 100%;
+                border: white 2px solid;
+                position: absolute;
+                top:0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin:auto;
+            }
+        </style>
     </head>
     <body>
-        <canvas id = "c" width=500 height=500 ></canvas>
-            <script src="Random_chess.js"></script>
+        <canvas id = "c" width=600 height=500 ></canvas>
+            <script src="Chessboard_script.js"></script>
         </canvas>
 
     </body>
