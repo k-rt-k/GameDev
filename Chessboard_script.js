@@ -556,16 +556,6 @@ canvas.on("mouse:down", function(options) {
 							}
 						}
 					}
-					/*if(move_to[0]-moved_from[0] == 2){
-						chessboard[move_to[0]-1][move_to[1]] = new chess_piece(move_to[0]-1, move_to[1], col, "r", 1);
-						chessboard[move_to[0]-1][move_to[1]].draw();
-						coverup(7, move_to[1]);
-					}
-					else if(move_to[0]-moved_from[0] == -2){
-						chessboard[move_to[0]+1][move_to[1]] = new chess_piece(move_to[0]+1, move_to[1], col, "r", 1);
-						chessboard[move_to[0]+1][move_to[1]].draw();
-						coverup(0, move_to[1]);
-					}*/
 				}
 				//console.log(moved_from[0], moved_from[1]);
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, nm+1);
@@ -662,7 +652,7 @@ canvas.on("mouse:down", function(options) {
 	else{
 	//choosing the piece
 		moved_from = get_square(options.e.clientX, options.e.clientY);
-		if(options.target.type == "image" && is_in_chessboard(moved_from[0], moved_from[1]) && !(chessboard[moved_from[0]][moved_from[1]]==0)){
+		if(is_in_chessboard(moved_from[0], moved_from[1]) && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
 			//console.log(chessboard[moved_from[0]][moved_from[1]]);
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
@@ -677,7 +667,7 @@ canvas.on("mouse:down", function(options) {
 					height:  SQUARE_WIDTH
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/8, fill:"#00CC00",opacity:0.3, left: CENTERX+SQUARE_WIDTH*(legal_moves[indexor][0]-4)+3*SQUARE_WIDTH/8,top: CENTERY+SQUARE_WIDTH*(legal_moves[indexor][1]-4)+3*SQUARE_WIDTH/8});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/6, fill:"#00CC00",opacity:0.3, left: CENTERX+SQUARE_WIDTH*(legal_moves[indexor][0]-4)+SQUARE_WIDTH/3,top: CENTERY+SQUARE_WIDTH*(legal_moves[indexor][1]-4)+SQUARE_WIDTH/3});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
 			}
