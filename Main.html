@@ -4,6 +4,28 @@
         <title>We Are Nubians</title>
         <script src="index.js"></script>
         <style>
+            * {
+                box-sizing: border-box;
+                }
+
+                .container {
+                float: left;
+                width: 33.33%;
+                
+                padding: 5px;
+                }
+
+                .clearfix::after {
+                content: "";
+                clear: both;
+                display: table;
+                }
+            div {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 80vh;
+                }
             body{
                 background-color: black;
             }
@@ -18,10 +40,12 @@
         </style>
     </head>
     <body>
-        <br><br>
-        <div align="center"><a href="Chessboard_main.html"><img src="Square.png" alt="standard chess" width="100"> <p>Standard</p></a></div>
-        <div align="center"><a href="Random.html"><img src="Rand.png" alt="fischer random/960 chess" width="100"><p>Random Chess</p></a></div>
-        <div align="center"><a href="Chessboard_Hex.html"><img src="Hexagon.png" alt="hexagonal chess (Glinski)" width="120"><p>Hexagonal Chess</p></a></div>
+        <div class="clearfix">
+            <div class="container" align="center"><a href="Chessboard_main.html"><img src="Square.png" alt="standard chess" width=50%> <br><br><p>Standard</p></a></div>
+            <div class="container" align="center"><a href="Random.html"><img src="Rand.png" alt="fischer random/960 chess" width=50%><br><br><p>Random Chess</p></a></div>
+            <div class="container" align="center"><a href="Chessboard_Hex.html"><img src="Hexagon.png" alt="hexagonal chess (Glinski)" width=50%><p>Hexagonal Chess</p></a></div>
+        </div>
+        
 
         <!canvas id="menu"><!/canvas>
     </body>
