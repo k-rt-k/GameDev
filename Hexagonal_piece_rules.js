@@ -295,7 +295,7 @@ class chess_piece{
 			let all_poss=[[this.x-1,this.y+2],[this.x+1,this.y-2],[this.x-1,this.y-3],[this.x+1,this.y+3],[this.x+2,this.y+3],[this.x+2,this.y-1],[this.x-2,this.y+1],[this.x-2,this.y-3],[this.x+3,this.y+1],[this.x-3,this.y-1],[this.x-3,this.y-2],[this.x+3,this.y+2]];
 			for (let i=0; i<12;i++){
 				let condition=(all_in_bounds(all_poss[0],all_poss[1])) && !this.same_color(chessboard[all_poss[i][0]][all_poss[i][1]]);
-				if (condition){poss.push(all_poss[i]);}
+				if (condition){poss.push(all_poss[i]);console.log(all_poss[i]);}
 			}
 		}
 		else if (this.piece=="k"){
@@ -457,13 +457,7 @@ col=0;
 to_be_moved = 0;
 legal_moves = [];
 var legal_moves_graphics=[];
-var shade_piece = new fabric.Polygon([
-	{ x: 0, y: 0 },
-	{ x: 0, y: 0 },
-	{ x: 0, y: 0},
-	{ x: 0, y: 0},
-	{ x: 0, y: 0},
-	{ x: 0, y: 0}],{
+var shade_piece = new fabric.Polygon([],{
 	fill: "#00cc00",
 	opacity: 0.4,
 	selectable: false
@@ -550,8 +544,8 @@ canvas.on("mouse:down", function(options) {
 	}
 	else{
 		moved_from = get_hex(options.e.clientX, options.e.clientY);
-		//console.log(chessboard[moved_from[0]][moved_from[1]]);
-		if(options.target.type == "image" && !(chessboard[moved_from[0]][moved_from[1]]==0)){		
+		console.log(chessboard[moved_from[0]][moved_from[1]]);
+		if(!(chessboard[moved_from[0]][moved_from[1]]==0)){		
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
 			if (col==w_b[white_move]){
 				to_be_moved = options.target;
