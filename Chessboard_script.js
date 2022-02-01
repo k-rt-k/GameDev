@@ -608,6 +608,7 @@ canvas.on("mouse:down", function(options) {
 							}
 							alert("Your input is invalid (You cannot promote to a king or a pawn)");
 						}
+						can_en_passant=[8,8];
 					}
 					//en passant
 					else if (moved_from[1]==can_en_passant[1]&&move_to[0]==can_en_passant[0]){
@@ -620,6 +621,7 @@ canvas.on("mouse:down", function(options) {
 						else can_en_passant=[8,8];
 					}
 				}
+				else can_en_passant=[8,8];
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, nm+1);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
