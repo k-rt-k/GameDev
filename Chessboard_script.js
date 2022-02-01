@@ -613,7 +613,7 @@ canvas.on("mouse:down", function(options) {
 					//en passant
 					else if (moved_from[1]==can_en_passant[1]&&move_to[0]==can_en_passant[0]){
 						coverup(can_en_passant[0],can_en_passant[1]);
-						console.log("en passant");
+						alg_chess_not = chess_not(col) + file(moved_from[0]) + "x" + file(move_to[0]) + rank(move_to[1]) + " e.p.";
 						can_en_passant=[8,8];
 					}
 					else{
