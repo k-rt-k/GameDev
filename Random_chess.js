@@ -7,10 +7,9 @@ function remove_from(the_array,black_list){
     }
     
 }
-var chessboard = [[0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0]];
 //fischer random chess/ chess 960
 //https://en.wikipedia.org/wiki/Fischer_random_chess#Creating_starting_positions
-function fischer_random(){
+function initialise(chessboard){
     let free_squares=[0,1,2,3,4,5,6,7]
     for(let i = 0; i<8; i++){
         chessboard[i][6] = new chess_piece(i, 6, "l", "p");

@@ -390,46 +390,8 @@ function f_legal_moves(this_chessboard, col){
 
 
 //positioning the pieces
-for(let i = 0; i<8; i++){
-	chessboard[i][6] = new chess_piece(i, 6, "l", "p", 0);
-	chessboard[i][6].draw();
-}
-for(let i = 0; i<8; i++){
-	chessboard[i][1] = new chess_piece(i, 1, "d", "p", 0);
-	chessboard[i][1].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[7*i][7] = new chess_piece(7*i, 7, "l", "r", 0);
-	chessboard[7*i][7].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[7*i][0] = new chess_piece(7*i, 0, "d", "r", 0);
-	chessboard[7*i][0].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[1+5*i][7] = new chess_piece(1+5*i, 7, "l", "n", 0);
-	chessboard[1+5*i][7].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[1+5*i][0] = new chess_piece(1+5*i, 0, "d", "n", 0);
-	chessboard[1+5*i][0].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[2+3*i][7] = new chess_piece(2+3*i, 7, "l", "b", 0);
-	chessboard[2+3*i][7].draw();
-}
-for(let i = 0; i<2; i++){
-	chessboard[2+3*i][0] = new chess_piece(2+3*i, 0, "d", "b", 0);
-	chessboard[2+3*i][0].draw();
-}
-chessboard[3][7] = new chess_piece(3, 7, "l", "q", 0);
-chessboard[3][7].draw();
-chessboard[3][0] = new chess_piece(3, 0, "d", "q", 0);
-chessboard[3][0].draw();
-chessboard[4][7] = new chess_piece(4, 7, "l", "k", 0);
-chessboard[4][7].draw();
-chessboard[4][0] = new chess_piece(4, 0, "d", "k", 0);
-chessboard[4][0].draw();
+initialise(chessboard); 
+
 
 function coverup(i, j){
 //use this as a last resort
@@ -594,16 +556,6 @@ canvas.on("mouse:down", function(options) {
 							}
 						}
 					}
-					/*if(move_to[0]-moved_from[0] == 2){
-						chessboard[move_to[0]-1][move_to[1]] = new chess_piece(move_to[0]-1, move_to[1], col, "r", 1);
-						chessboard[move_to[0]-1][move_to[1]].draw();
-						coverup(7, move_to[1]);
-					}
-					else if(move_to[0]-moved_from[0] == -2){
-						chessboard[move_to[0]+1][move_to[1]] = new chess_piece(move_to[0]+1, move_to[1], col, "r", 1);
-						chessboard[move_to[0]+1][move_to[1]].draw();
-						coverup(0, move_to[1]);
-					}*/
 				}
 				//console.log(moved_from[0], moved_from[1]);
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, nm+1);
@@ -700,7 +652,7 @@ canvas.on("mouse:down", function(options) {
 	else{
 	//choosing the piece
 		moved_from = get_square(options.e.clientX, options.e.clientY);
-		if(options.target.type == "image" && is_in_chessboard(moved_from[0], moved_from[1]) && !(chessboard[moved_from[0]][moved_from[1]]==0)){
+		if(is_in_chessboard(moved_from[0], moved_from[1]) && !(chessboard[moved_from[0]][moved_from[1]]==0)){
 			//console.log(moved_from);
 			//console.log(chessboard[moved_from[0]][moved_from[1]]);
 			col = chessboard[moved_from[0]][moved_from[1]].get_color();	
@@ -715,7 +667,7 @@ canvas.on("mouse:down", function(options) {
 					height:  SQUARE_WIDTH
 				});
 				for (var indexor=0; indexor<legal_moves.length; indexor++){
-					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/8, fill:"#00CC00",opacity:0.3, left: CENTERX+SQUARE_WIDTH*(legal_moves[indexor][0]-4)+3*SQUARE_WIDTH/8,top: CENTERY+SQUARE_WIDTH*(legal_moves[indexor][1]-4)+3*SQUARE_WIDTH/8});
+					legal_moves_graphics[indexor]= new fabric.Circle({radius:SQUARE_WIDTH/6, fill:"#00CC00",opacity:0.3, left: CENTERX+SQUARE_WIDTH*(legal_moves[indexor][0]-4)+SQUARE_WIDTH/3,top: CENTERY+SQUARE_WIDTH*(legal_moves[indexor][1]-4)+SQUARE_WIDTH/3});
 					canvas.add(legal_moves_graphics[indexor]);
 				}
 			}
