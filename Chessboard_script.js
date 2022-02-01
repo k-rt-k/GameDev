@@ -23,14 +23,31 @@ function get_square(coor_x, coor_y){
 	return [p, q];
 }
 
+function file(coor_x){
+	return String.fromCharCode(coor_x + 97);
+}
+function rank(coor_y){
+	return (8-coor_y);
+}
+function chess_not(col){
+	if(col == "l"){
+		return "W: ";
+	}
+	return "B: ";
+}
+
+
 
 function my_includes(legal_moves, move_to){
-	for(let i = 0; i<legal_moves.length; i++){
-		if(legal_moves[i].length == 3 && move_to.length == 3){
+	if(move_to.length == 3){
+		for(let i = 0; i<legal_moves.length; i++){
+			if(legal_moves[i].length == 2){continue;}
 			if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1] && legal_moves[i][2] == move_to[2]){return true;}
 		}
-		else{
-			if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){return true;}	
+	}
+	else{
+		for(let i = 0; i<legal_moves.length; i++){
+			if(legal_moves[i][0] == move_to[0] && legal_moves[i][1] == move_to[1]){return true;}
 		}
 	}
 	return false;
@@ -387,14 +404,13 @@ function f_legal_moves(this_chessboard, col){
 	return false;
 }
 
-
+let gameend = false;
 
 //positioning the pieces
 initialise(chessboard); 
 
 
 function coverup(i, j){
-//use this as a last resort
 	chessboard[i][j] = 0;
 	var col;
 	if((i+j)%2 == 1){
@@ -416,6 +432,7 @@ function coverup(i, j){
 	canvas.add(shade_piece);
 }
 
+alg_chess_not = "";
 move_to = [8, 8]; //square to which piece is to be moved
 //[8,8] means that no move has been chosen yet
 selected = false;
@@ -427,7 +444,7 @@ legal_moves = [];
 var legal_moves_graphics=[];
 var shade_piece =new fabric.Rect({fill: "#00cc00", opacity: 0.4 ,selectable: false});
 canvas.add(shade_piece);
-var bkcastle=true,bqcastle=true,wkcastle=true,wqcastle=true;
+//var bkcastle=true,bqcastle=true,wkcastle=true,wqcastle=true;
 
 canvas.on("mouse:down", function(options) {
 //main game loop
@@ -441,40 +458,59 @@ canvas.on("mouse:down", function(options) {
 			//console.log(legal_moves);
 			if(my_includes(legal_moves, move_to)){ //can't use .includes for n-d arrays
 				//console.log(chessboard[moved_from[0]][moved_from[1]]);
+				if(white_move==0){alg_chess_not+="W: ";}
+				else{alg_chess_not+="B: ";}
 				pc = chessboard[moved_from[0]][moved_from[1]].get_piece();
 				let nm = chessboard[moved_from[0]][moved_from[1]].get_num_moves();
-				coverup(moved_from[0], moved_from[1]);
-				//undraw the old thing somehow;
-				//console.log(chessboard[move_to[0]][move_to[1]]);
-				if(!(chessboard[move_to[0]][move_to[1]]==0)){
-					//console.log(options.target.type);
-					//console.log(chessboard[move_to[0]][move_to[1]]);
-					coverup(move_to[0], move_to[1]);
+				if(pc!="p"){
+					alg_chess_not+=String.fromCharCode(pc.charCodeAt(0)-32);
 				}
-				if(pc == "p"){
-					if((col == "l"&&move_to[1]==0)||(col=="d"&&move_to[1]==7)){	//promotion
-						while(true){
-							let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
-							if(input == "q" || input == "b" || input == "n" || input == "r"){
-								pc = input;
-								break;
-							}
-							alert("Your input is invalid (You cannot promote to a king or a pawn)");
-						}
+				let id_move_pieces = [];
+				for(let i1 = 0; i1<8; i1++){
+					for(let i2 = 0; i2<8; i2++){
+						if(i1 == moved_from[0] && i2 == moved_from[1]){continue;}
+						if(chessboard[i1][i2]==0){continue;}
+						if(chessboard[i1][i2].get_color()!=w_b[white_move]){continue;}
+						if(chessboard[i1][i2].get_piece()!=pc){continue;}
+						if(!my_includes(chessboard[i1][i2].poss_moves(chessboard), move_to)){continue;}
+						id_move_pieces.push([i1, i2]);
 					}
-					//en passant
-					else if (moved_from[1]==can_en_passant[1]&&move_to[0]==can_en_passant[0]){
-						coverup(can_en_passant[0],can_en_passant[1]);
-						can_en_passant=[8,8];
+				}
+				if(id_move_pieces.length>0){
+					let same_file = false;
+					for(let index = 0; index < id_move_pieces.length; index++){
+						if(id_move_pieces[index][0] == moved_from[0]){same_file = true; break;}
+					}
+					if(!same_file){
+						alg_chess_not+=file(moved_from[0]);
 					}
 					else{
-						if ((col == "d"&&moved_from[1]==1&&move_to[1]==3)||(col=="l"&&moved_from[1]==6&&move_to[1]==4)) {can_en_passant[0]=move_to[0];can_en_passant[1]=move_to[1];}
-						else can_en_passant=[8,8];
+						let same_rank = false;
+						for(let index = 0; index < id_move_pieces.length; index++){
+							if(id_move_pieces[index][1] == moved_from[1]){same_rank = true; break;}
+						}
+						if(!same_rank){
+							alg_chess_not+=rank(moved_from[1]);
+						}
+						else{
+							alg_chess_not+=(file(moved_from[0])+rank(moved_from[1]));
+						}
 					}
 				}
+				coverup(moved_from[0], moved_from[1]);
+				//undraw the old thing somehow;
+				if(!(chessboard[move_to[0]][move_to[1]]==0)){
+					if(pc == "p"&&id_move_pieces.length==0){
+						alg_chess_not+=file(moved_from[0]);
+					}
+					alg_chess_not+="x";
+					coverup(move_to[0], move_to[1]);
+				}
+				alg_chess_not+=(file(move_to[0])+rank(move_to[1]));
 				if(pc == "k"){
 					if(move_to[0] == 6){
 					//h-side castling
+					//console.log(legal_moves);
 						if(my_includes(legal_moves, [move_to[0], move_to[1], "ch"])){
 							let should_castle = false;
 							if(move_to[0]-moved_from[0] == 1 || move_to[0]-moved_from[0] == -1){
@@ -509,6 +545,7 @@ canvas.on("mouse:down", function(options) {
 								}
 							}
 							if(should_castle){
+								alg_chess_not = chess_not(col) + "O-O";
 								chessboard[5][move_to[1]] = new chess_piece(5, move_to[1], col, "r", 1);
 								chessboard[5][move_to[1]].draw();
 							}
@@ -516,6 +553,7 @@ canvas.on("mouse:down", function(options) {
 					}
 					else if(move_to[0] == 2){
 					//a-side castling
+					//console.log(legal_moves);
 						if(my_includes(legal_moves, [move_to[0], move_to[1], "ca"])){
 							let should_castle = false;
 							if(move_to[0] - moved_from[0] == 1 || move_to[0] - moved_from[0] == -1){
@@ -551,13 +589,37 @@ canvas.on("mouse:down", function(options) {
 								}
 							}
 							if(should_castle){
+								alg_chess_not = chess_not(col) + "O-O-O";
 								chessboard[3][move_to[1]] = new chess_piece(3, move_to[1], col, "r", 1);
 								chessboard[3][move_to[1]].draw();
 							}
 						}
 					}
 				}
-				//console.log(moved_from[0], moved_from[1]);
+				if(pc == "p"){
+					//console.log(can_en_passant);
+					if((col == "l"&&move_to[1]==0)||(col=="d"&&move_to[1]==7)){	//promotion
+						while(true){
+							let input = prompt("What do you want to promote this pawn to? Enter 'q' to promote to a Queen, 'b' to promote to a bishop, 'n' to promote to a knight or 'r' to promote to a rook");
+							if(input == "q" || input == "b" || input == "n" || input == "r"){
+								pc = input;
+								alg_chess_not+=("="+String.fromCharCode(pc.charCodeAt(0)-32));
+								break;
+							}
+							alert("Your input is invalid (You cannot promote to a king or a pawn)");
+						}
+					}
+					//en passant
+					else if (moved_from[1]==can_en_passant[1]&&move_to[0]==can_en_passant[0]){
+						coverup(can_en_passant[0],can_en_passant[1]);
+						console.log("en passant");
+						can_en_passant=[8,8];
+					}
+					else{
+						if ((col == "d"&&moved_from[1]==1&&move_to[1]==3)||(col=="l"&&moved_from[1]==6&&move_to[1]==4)) {can_en_passant[0]=move_to[0];can_en_passant[1]=move_to[1];}
+						else can_en_passant=[8,8];
+					}
+				}
 				chessboard[move_to[0]][move_to[1]] = new chess_piece(move_to[0], move_to[1], col, pc, nm+1);
 				chessboard[move_to[0]][move_to[1]].draw();
 				chessboard[moved_from[0]][moved_from[1]] = 0;
@@ -570,6 +632,7 @@ canvas.on("mouse:down", function(options) {
 			if(chessboard[move_to[0]][move_to[1]]!=0){
 				if(chessboard[move_to[0]][move_to[1]].get_piece()=="k"){
 					if(move_to[0]==6){
+						//console.log(legal_moves);
 						if(my_includes(legal_moves, [6, move_to[1], "ch"])){
 							while(true){
 								let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
@@ -582,6 +645,7 @@ canvas.on("mouse:down", function(options) {
 											}
 										}
 									}
+									alg_chess_not = chess_not(chessboard[move_to[0]][move_to[1]].get_color())+"O-O";
 									chessboard[5][move_to[1]] = new chess_piece(5, move_to[1], chessboard[move_to[0]][move_to[1]].get_color(), "r", 1);
 									chessboard[5][move_to[1]].draw();
 									legal_moves = [];
@@ -597,6 +661,7 @@ canvas.on("mouse:down", function(options) {
 						}
 					}
 					else if(move_to[0]==2){
+						//console.log(legal_moves);
 						if(my_includes(legal_moves, [2, move_to[1], "ca"])){
 							while(true){
 								let input = prompt("Do you want to Castle? Enter 'y' if you do and 'n' if you don't");
@@ -609,6 +674,7 @@ canvas.on("mouse:down", function(options) {
 											}
 										}
 									}
+									alg_chess_not = chess_not(chessboard[move_to[0]][move_to[1]].get_color())+"O-O-O";
 									chessboard[3][move_to[1]] = new chess_piece(3, move_to[1], chessboard[move_to[0]][move_to[1]].get_color(), "r", 1);
 									chessboard[3][move_to[1]].draw();
 									legal_moves = [];
@@ -626,6 +692,7 @@ canvas.on("mouse:down", function(options) {
 				}
 			}
 		}
+		let EOG = "";
 		move_to = [8, 8];
 		selected = false;
 		shade_piece.set({width:0, height:0});
@@ -634,19 +701,31 @@ canvas.on("mouse:down", function(options) {
 			if(white_move==0){
 				if(is_in_check(chessboard, "l")){
 					alert("Checkmate, Black Wins");
+					alg_chess_not+="#"
+					EOG = "0-1";
 				}
 				else{
 					alert("Tie by Stalemate");
+					EOG = "1/2 - 1/2";
 				}
 			}
 			else{
 				if(is_in_check(chessboard, "d")){
 					alert("Checkmate, White Wins");
+					alg_chess_not+="#"
+					EOG = "1-0";
 				}
 				else{
 					alert("Tie by Stalemate");
+					EOG = "1/2 - 1/2";
 				}
 			}
+		}
+		else if(is_in_check(chessboard, w_b[white_move])&&alg_chess_not!=""){alg_chess_not+="+";}
+		if(!gameend){
+			if(alg_chess_not!="") console.log(alg_chess_not);
+			alg_chess_not = "";
+			if(EOG!="") {console.log(EOG); gameend = true;}
 		}
 	}
 	else{
