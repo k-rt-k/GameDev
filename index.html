@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>We Are Nubians</title>
+        <script src="index.js"></script>
+        <style>
+            * {
+                box-sizing: border-box;
+                }
+
+                .container {
+                float: left;
+                width: 33.33%;
+                
+                padding: 5px;
+                }
+
+                .clearfix::after {
+                content: "";
+                clear: both;
+                display: table;
+                }
+            div {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 80vh;
+                }
+            body{
+                background-color: black;
+            }
+            a{
+                align-content: center;
+            }
+            p{
+                color: white;
+                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="clearfix">
+            <div class="container" align="center"><a href="Chessboard_main.html"><img src="Square.png" alt="standard chess" width=50%> <br><br><p>Standard</p></a></div>
+            <div class="container" align="center"><a href="Random.html"><img src="Rand.png" alt="fischer random/960 chess" width=50%><br><br><p>Random Chess</p></a></div>
+            <div class="container" align="center"><a href="Chessboard_Hex.html"><img src="Hexagon.png" alt="hexagonal chess (Glinski)" width=50%><p>Hexagonal Chess</p></a></div>
+        </div>
+        
+
+        <!canvas id="menu"><!/canvas>
+    </body>
+
+</html>
