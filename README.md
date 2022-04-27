@@ -9,3 +9,15 @@ We have implemented three variations of chess - the standard variant, Fischer Ra
 
 We have implemented all the FIDE Rules of Chess, including Castling and En Passant.
 On the standard variant and fischer variant, open the console to see the moves in algebraic chess notation!
+
+# A still from a game of Chess
+![image description](readme1.png)
+
+# The starting position of Standard Chess
+![image description](readme2.png)
+
+# The starting position of Glinski's Variant
+![image description](readme4.png)
+
+# A possible starting position of Fischer Random Chess
+![image description](readme3.png)
