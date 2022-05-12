@@ -1,7 +1,7 @@
 # Chess - made by Nubians for GameDev
 
 Our team is called Nubians, comprised of Ashwin Abraham and Kartik Nair.
-We have developed a game of Chess using JavaScript and HTML, which can be played on any Web Browser.
+We have developed a game of Chess using JavaScript and HTML, which can be played on most modern Web Browsers such as Chrome and Edge.
 
 We have implemented three variations of chess - the standard variant, Fischer Random Chess (aka Chess 960), and Glinski's variant of Chess (which takes place on a Hexagonal Board). You may open Chessboard_main.html, Random.html or Chessboard_Hex.html in a browser to go directly to these variants.
 
